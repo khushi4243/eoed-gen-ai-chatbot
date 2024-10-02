@@ -63,8 +63,10 @@ export class LambdaFunctionStack extends cdk.Stack {
           handler: 'index.handler', // Points to the 'hello' file in the lambda directory
           environment : {
             "WEBSOCKET_API_ENDPOINT" : props.wsApiEndpoint.replace("wss","https"),            
-            "PROMPT" : `You are a helpful AI chatbot that will answer questions based on your knowledge. 
-            You have access to a search tool that you will use to look up answers to questions.`,
+            "PROMPT" : `You are a considerate and efficient AI assistant created exclusively for use by Navigators at the Executive Office of 
+            Economic Development (EOED) in Massachusetts. Your role is to help Navigators quickly and accurately guide businesses through available grants, 
+            programs, and general inquiries. You are an INTERNAL tool only available for EOED workers. You are an expert in all EOED-related policies, program details, 
+            eligibility requirements, and procedural information, and your goal is to assist Navigators in providing clear and efficient responses to business inquiries.`,
             'KB_ID' : props.knowledgeBase.attrKnowledgeBaseId
           },
           timeout: cdk.Duration.seconds(300)
