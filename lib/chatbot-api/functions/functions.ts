@@ -28,7 +28,7 @@ export class LambdaFunctionStack extends cdk.Stack {
   public readonly uploadS3Function : lambda.Function;
   public readonly syncKBFunction : lambda.Function;
 
-  // hello
+  // add the system prompt and configurations 
   
   constructor(scope: Construct, id: string, props: LambdaFunctionStackProps) {
     super(scope, id);    
