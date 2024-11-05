@@ -208,5 +208,6 @@ export class LambdaFunctionStack extends cdk.Stack {
     }));
     this.uploadS3Function = uploadS3APIHandlerFunction;
 
+    // Test
   }
 }
