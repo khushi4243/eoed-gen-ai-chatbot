@@ -208,6 +208,44 @@ export class LambdaFunctionStack extends cdk.Stack {
     }));
     this.uploadS3Function = uploadS3APIHandlerFunction;
 
-    // Test
+        // Define the Lambda function for metadata
+        const metadataHandlerFunction = new lambda.Function(scope, 'MetadataHandlerFunction', {
+          runtime: lambda.Runtime.PYTHON_3_12,
+          code: lambda.Code.fromAsset(path.join(__dirname, 'metadata-handler')),
+          handler: 'lambda_function.lambda_handler',
+          timeout: cdk.Duration.seconds(30),
+          environment: {
+            "BUCKET": props.knowledgeBucket.bucketName,
+            "KB_ID": props.knowledgeBase.attrKnowledgeBaseId
+          },
+        });
+    
+    
+    
+        metadataHandlerFunction.addToRolePolicy(new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: [
+            's3:*' ,// Grants full access to all S3 actions (read, write, delete, etc.)
+            'bedrock:InvokeModel',
+            'bedrock:Retrieve',
+          ],
+          resources: [
+            props.knowledgeBucket.bucketArn,               // Grants access to the bucket itself (for actions like ListBucket)
+            props.knowledgeBucket.bucketArn + "/*" ,        // Grants access to all objects within the bucket
+            'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0',  // Add the Bedrock model resource explicitly
+            props.knowledgeBase.attrKnowledgeBaseArn,
+    
+          ]
+        }));
+    
+    
+    // Trigger the lambda function when a document is uploaded
+    
+        this.metadataHandlerFunction = metadataHandlerFunction;
+    
+          metadataHandlerFunction.addEventSource(new S3EventSource(props.knowledgeBucket, {
+            events: [s3.EventType.OBJECT_CREATED],
+          }));
+    
   }
 }
