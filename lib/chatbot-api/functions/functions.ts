@@ -8,6 +8,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as bedrock from "aws-cdk-lib/aws-bedrock";
+import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 interface LambdaFunctionStackProps {  
   readonly wsApiEndpoint : string;  
