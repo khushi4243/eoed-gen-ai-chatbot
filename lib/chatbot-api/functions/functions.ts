@@ -8,6 +8,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as bedrock from "aws-cdk-lib/aws-bedrock";
+import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+
 
 interface LambdaFunctionStackProps {  
   readonly wsApiEndpoint : string;  
@@ -27,6 +29,7 @@ export class LambdaFunctionStack extends cdk.Stack {
   public readonly getS3Function : lambda.Function;
   public readonly uploadS3Function : lambda.Function;
   public readonly syncKBFunction : lambda.Function;
+  metadataHandlerFunction: cdk.aws_lambda.Function;
 
   // add the system prompt and configurations 
   
@@ -212,8 +215,8 @@ export class LambdaFunctionStack extends cdk.Stack {
     }));
     this.uploadS3Function = uploadS3APIHandlerFunction;
 
-        // Define the Lambda function for metadata
-        const metadataHandlerFunction = new lambda.Function(scope, 'MetadataHandlerFunction', {
+  // Define the Lambda function for metadata
+      const metadataHandlerFunction = new lambda.Function(scope, 'MetadataHandlerFunction', {
           runtime: lambda.Runtime.PYTHON_3_12,
           code: lambda.Code.fromAsset(path.join(__dirname, 'metadata-handler')),
           handler: 'lambda_function.lambda_handler',
@@ -222,9 +225,9 @@ export class LambdaFunctionStack extends cdk.Stack {
             "BUCKET": props.knowledgeBucket.bucketName,
             "KB_ID": props.knowledgeBase.attrKnowledgeBaseId
           },
-        });
+      });
     
-    
+
     
         metadataHandlerFunction.addToRolePolicy(new iam.PolicyStatement({
           effect: iam.Effect.ALLOW,
