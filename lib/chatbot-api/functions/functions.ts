@@ -4,6 +4,7 @@ import * as path from 'path';
 
 // Import Lambda L2 construct
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -27,6 +28,7 @@ export class LambdaFunctionStack extends cdk.Stack {
   public readonly getS3Function : lambda.Function;
   public readonly uploadS3Function : lambda.Function;
   public readonly syncKBFunction : lambda.Function;
+  public readonly metadataHandlerFunction : lambda.Function;
 
   constructor(scope: Construct, id: string, props: LambdaFunctionStackProps) {
     super(scope, id);    
@@ -65,7 +67,40 @@ export class LambdaFunctionStack extends cdk.Stack {
             "WEBSOCKET_API_ENDPOINT" : props.wsApiEndpoint.replace("wss","https"),            
             "PROMPT" : `You are a helpful AI chatbot that will answer questions based on your knowledge. 
             You have access to a search tool that you will use to look up answers to questions.`,
-            'KB_ID' : props.knowledgeBase.attrKnowledgeBaseId
+            'KB_ID' : props.knowledgeBase.attrKnowledgeBaseId,
+            'CONFL_PROMPT': `You are a knowledge expert looking to either identify conflicts among the 
+            above documents or assure the user that no conflicts exist. You are not looking for small 
+            syntatic or grammatical differences, but rather pointing out major factual inconsistencies. 
+            You can be confident about identifying a conflict between two documents if the conflict 
+            represents a major factual difference that would result in semantic differences between 
+            responses constructed with each respective decoment. If conflicts are detected, please format 
+            them in an organized list where each entry includes the names of the conflicting documents as 
+            well as the conflicting statements. Use each document's actual name from the source uri in 
+            this list.If there is no conflict please respond only with "no 
+            conflicts detected" Do not include any additional information. Only include identified 
+            conflicts that you are confident are factual inconsistencies. Do not include identified 
+            conflicts that you are not confident are real conflicts. Do not report conflicts that are not 
+            relevant to the user's query, which will be given below. Below is an example user query with 
+            examples of a relevant conflict, an irrelevant conflict, and a non conflict: 
+            <example_user_query> "Are state parks in Massachusetts open year-round, and are there any 
+            costs associated with access for residents?" </example_user_query> Example of a Relevant 
+            Conflict <conflict_example> Document A: "Massachusetts state parks are open year-round and 
+            free for all residents." Document B: "Massachusetts state parks are closed during the winter 
+            season." Conflict Reason: The statements directly conflict on whether parks remain open 
+            year-round, which is relevant to the user’s query. inclusion: This conflict would be included 
+            as a conflict for the given user query. It is a clear factual conflict, and it is relevant to 
+            the example user query. </conflict_example> Example of a Non-Conflict <non_conflict_example> 
+            Document A: "Massachusetts state parks offer seasonal programs." Document B: "Some parks may 
+            require entrance fees for special events." Reason: These statements do not contradict each 
+            other. inclusion: This would not be included as a conflict for the given user query. It is 
+            not a factual conflict. </non_conflict_example> Example of an Irrelevant Conflict 
+            <irrelevant_conflict_example> Document C: "Parks in western Massachusetts do not allow pets 
+            on trails" Document D: "State parks in western Massachusetts allow pets on trails as long as 
+            they are leashed." Reason: While these statements conflict on whether pets are allowed at 
+            parks, niether statement is about year-round park access or costs to access parks, which is 
+            the focus of the user’s query. inclusion: This would not be included as a conflict for the 
+            given user query. Although it is a factual conflict, it is not relevant to the given user 
+            query. </irrelevant_conflict_example>`
           },
           timeout: cdk.Duration.seconds(300)
         });
