@@ -47,7 +47,7 @@ export interface ChatInputPanelProps {
   setRunning: Dispatch<SetStateAction<boolean>>;
   session: { id: string; loading: boolean };
   messageHistory: ChatBotHistoryItem[];
-  setMessageHistory: (history: ChatBotHistoryItem[]) => void;  
+  setMessageHistory: Dispatch<SetStateAction<ChatBotHistoryItem[]>>;  
 }
 
 export abstract class ChatScrollState {
@@ -165,12 +165,14 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           type: ChatBotMessageType.Human,
           content: messageToSend,
           metadata: {            
-          },          
+          },
+          conflictReport: "",          
         },
         {
           type: ChatBotMessageType.AI,          
           content: receivedData,
           metadata: {},
+          conflictReport: "",
         },
       ];
       props.setMessageHistory(messageHistoryRef.current);
@@ -201,6 +203,7 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           type: ChatBotMessageType.AI,          
           content: 'Response timed out!',
           metadata: {},
+          conflictReport: "",
         })
       }},60000)
 
@@ -262,23 +265,24 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
         }
 
         // Update the chat history state with the new message        
-        messageHistoryRef.current = [
-          ...messageHistoryRef.current.slice(0, -2),
-
-          {
-            type: ChatBotMessageType.Human,
-            content: messageToSend,
-            metadata: {
-              
-            },            
-          },
-          {
-            type: ChatBotMessageType.AI,            
-            content: receivedData,
-            metadata: sources,
-          },
-        ];        
-        props.setMessageHistory(messageHistoryRef.current);        
+        props.setMessageHistory((prevHistory) => {
+          const newHistory = [
+            ...prevHistory.slice(0, -2),
+            {
+              type: ChatBotMessageType.Human,
+              content: messageToSend,
+              metadata: {},
+              conflictReport: "",
+            },
+            {
+              type: ChatBotMessageType.AI,
+              content: receivedData,
+              metadata: sources,
+              conflictReport: "",
+            },
+          ];
+          return newHistory;
+        });        
       });
       // Handle possible errors
       ws.addEventListener('error', function error(err) {

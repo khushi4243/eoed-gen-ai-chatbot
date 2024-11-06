@@ -14,7 +14,7 @@ import {
   Select
 } from "@cloudscape-design/components";
 import * as React from "react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styles from "../../styles/chat.module.scss";
@@ -30,11 +30,18 @@ import "../../styles/app.scss";
 import { useNotifications } from "../notif-manager";
 import { Utils } from "../../common/utils";
 import {feedbackCategories, feedbackTypes} from '../../common/constants'
+import { AppContext } from "../../common/app-context"; 
+import { useContext } from "react";
+import { Auth } from "aws-amplify";
 
 export interface ChatMessageProps {
-  message: ChatBotHistoryItem;  
+  message: ChatBotHistoryItem; 
+  messageKey: number;
+  messageIndex: number;
+  session: string; 
   onThumbsUp: () => void;
   onThumbsDown: (feedbackTopic : string, feedbackType : string, feedbackMessage: string) => void;  
+  updateMessageConflictReport: (messageIndex: number, conflictReport: string) => void;
 }
 
 
@@ -47,6 +54,11 @@ export default function ChatMessage(props: ChatMessageProps) {
   const [selectedTopic, setSelectedTopic] = React.useState({label: "Select a Topic", value: "1"});
   const [selectedFeedbackType, setSelectedFeedbackType] = React.useState({label: "Select a Problem", value: "1"});
   const [value, setValue] = useState("");
+  const [conflictReport, setConflictReport] = useState(props.message.conflictReport || "");
+  const [showConflictButton, setShowConflictButton] = useState(!props.message.conflictReport);
+  const [loadingConflictReport, setLoadingConflictReport] = useState(false);
+  const appContext = useContext(AppContext);
+
 
 
   const content =
@@ -54,8 +66,88 @@ export default function ChatMessage(props: ChatMessageProps) {
       ? props.message.content
       : "";
 
+      const handleConflictReport = async () => {
+        if (loadingConflictReport) return; // Prevent multiple clicks
+        setLoadingConflictReport(true);
+    
+        // get authenticated user
+        let username;
+        try {
+          const user = await Auth.currentAuthenticatedUser();
+          username = user.username;
+          if (!username) throw new Error("Unable to get current user.");
+        } catch (error) {
+          addNotification("error", error.message);
+          setLoadingConflictReport(false);
+          return;
+        }
+    
+        // setup websocket
+        const TOKEN = await Utils.authenticate();
+    
+        // WebSocket endpoint
+        const wsEndpoint = appContext.wsEndpoint;
+        const wsUrl = `${wsEndpoint}/?Authorization=${TOKEN}`;
+        const ws = new WebSocket(wsUrl);
+    
+        let conflictReportData = "";
+
+        ws.addEventListener("open", () => {
+          const messagePayload = JSON.stringify({
+            action: "generateConflictReport",
+            data: {
+              key: props.messageKey,
+              user_id: username,
+              session_id: props.session,
+            },
+          });
+          ws.send(messagePayload);
+        });
+    
+        ws.addEventListener("message", (event) => {
+          const data = event.data;
+    
+          if (data.includes("<!ERROR!>:")) {
+            addNotification("error", data);
+            ws.close();
+            setLoadingConflictReport(false);
+            return;
+          }
+          if (data === "!<|EOF_STREAM|>!") {
+            // End of message
+            ws.close();
+            props.updateMessageConflictReport(props.messageIndex, conflictReportData);
+            setLoadingConflictReport(false);
+            setShowConflictButton(false);
+            return;
+          }
+    
+          // Append data to conflict report
+          conflictReportData += data;
+          setConflictReport((prev) => prev + data);
+        });
+    
+        ws.addEventListener("error", (err) => {
+          console.error("WebSocket error:", err);
+          addNotification("error", "An error occurred with the WebSocket connection.");
+          ws.close();
+          setLoadingConflictReport(false);
+        });
+    
+        ws.addEventListener("close", () => {
+          setLoadingConflictReport(false);
+          setShowConflictButton(false);
+        });
+      };
+  
   const showSources = props.message.metadata?.Sources && (props.message.metadata.Sources as any[]).length > 0;
   
+  // useEffect(() => {
+  //   if (props.message.conflictReport) {
+  //     setConflictReport(props.message.conflictReport);
+  //     setShowConflictButton(false);
+  //   }
+  // }, [props.message.conflictReport]);
 
   return (
     <div>
@@ -118,16 +210,35 @@ export default function ChatMessage(props: ChatMessageProps) {
       </Modal>
       {props.message?.type === ChatBotMessageType.AI && (
         <Container
-          footer={
-            showSources && (
-              <SpaceBetween direction="horizontal" size="s">
+        footer={
+          showSources && (
+            <SpaceBetween direction="horizontal" size="s">
               <ButtonDropdown
-              items={(props.message.metadata.Sources as any[]).map((item) => { return {id: "id", disabled: false, text : item.title, href : item.uri, external : true, externalIconAriaLabel: "(opens in new tab)"}})}
-        
-              >Sources</ButtonDropdown>              
-              </SpaceBetween>
-            )
-          }
+                items={(props.message.metadata.Sources as any[]).map((item) => {
+                  return {
+                    id: "id",
+                    disabled: false,
+                    text: item.title,
+                    href: item.uri,
+                    external: true,
+                    externalIconAriaLabel: "(opens in new tab)",
+                  };
+                })}
+              >
+                Sources
+              </ButtonDropdown>
+              {showConflictButton && (
+                <Button
+                  variant="primary"
+                  onClick={handleConflictReport}
+                  disabled={loadingConflictReport}
+                >
+                  {loadingConflictReport ? "Generating Report..." : "Identify Source Conflicts"}
+                </Button>
+              )}
+            </SpaceBetween>
+          )
+        }
         >
           {content?.length === 0 ? (
             <Box>
@@ -222,6 +333,14 @@ export default function ChatMessage(props: ChatMessageProps) {
               />
             )}
           </div>
+          {conflictReport && (
+          <div className={styles.conflictReport}>
+            <TextContent>
+              <strong>Conflict Report:</strong>
+              <p>{conflictReport}</p>
+            </TextContent>
+          </div>
+        )}
         </Container>
       )}
       {loading && (

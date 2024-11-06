@@ -53,7 +53,7 @@ export default function Chat(props: { sessionId?: string}) {
         let username;
         await Auth.currentAuthenticatedUser().then((value) => username = value.username);
         if (!username) return;
-        const hist = await apiClient.sessions.getSession(props.sessionId,username);
+        const hist = await apiClient.sessions.getSession(props.sessionId, username);
 
         if (hist) {
           
@@ -67,6 +67,7 @@ export default function Chat(props: { sessionId?: string}) {
                 type: x!.type as ChatBotMessageType,
                 metadata: x!.metadata!,
                 content: x!.content,
+                conflictReport: x!.conflictReport,
               }))
           );
 
@@ -114,6 +115,31 @@ export default function Chat(props: { sessionId?: string}) {
     await apiClient.userFeedback.sendUserFeedback(feedbackData);
   }
 
+  const updateMessageConflictReport = async (messageIndex: number, conflictReport: string) => {
+    setMessageHistory(prev => {
+      const newMessageHistory = [...prev];
+      newMessageHistory[messageIndex] = {
+        ...newMessageHistory[messageIndex],
+        conflictReport: conflictReport,
+      };
+      return newMessageHistory;
+    });
+  
+    // Save the updated message to the backend
+    // if (session.id && appContext) {
+    //   const apiClient = new ApiClient(appContext);
+    //   try {
+    //     await apiClient.sessions.updateMessage(session.id, messageIndex, {
+    //       ...messageHistory[messageIndex],
+    //       conflictReport,
+    //     });
+    //   } catch (error) {
+    //     console.error("Failed to update message with conflict report", error);
+    //   }
+    // }
+  };
+  
+
   return (
     <div className={styles.chat_container}> 
       <SpaceBetween direction="vertical" size="m">
@@ -130,9 +156,13 @@ export default function Chat(props: { sessionId?: string}) {
         {messageHistory.map((message, idx) => (
           <ChatMessage
             key={idx}
-            message={message}            
+            message={message}
+            messageKey={Math.floor(idx / 2)}
+            messageIndex={idx}
+            session={props.sessionId}             
             onThumbsUp={() => handleFeedback(1,idx, message)}
-            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}                        
+            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}
+            updateMessageConflictReport={updateMessageConflictReport}
           />
         ))}
       </SpaceBetween>
