@@ -255,80 +255,80 @@ def list_sessions_by_user_id(user_id, limit = 15):
     }
     return response  # Return the response object
 
-def load_excel_from_dynamodb(session_id, user_id):
-    try:
-        # Query DynamoDB for the item containing the S3 bucket and key
-        response = table.get_item(Key={"session_id": session_id, "user_id": user_id})
+# def load_excel_from_dynamodb(session_id, user_id):
+#     try:
+#         # Query DynamoDB for the item containing the S3 bucket and key
+#         response = table.get_item(Key={"session_id": session_id, "user_id": user_id})
         
-        if 'Item' not in response:
-            print("Item not found in DynamoDB")
-            return None
+#         if 'Item' not in response:
+#             print("Item not found in DynamoDB")
+#             return None
 
-        item = response['Item']
-        bucket_name = item.get('s3_bucket')
-        file_key = item.get('s3_key')
+#         item = response['Item']
+#         bucket_name = item.get('s3_bucket')
+#         file_key = item.get('s3_key')
 
-        if not bucket_name or not file_key:
-            print("S3 bucket or key not found in the DynamoDB item")
-            return None
+#         if not bucket_name or not file_key:
+#             print("S3 bucket or key not found in the DynamoDB item")
+#             return None
 
-        # Load the Excel file from S3
-        s3_response = s3.get_object(Bucket=bucket_name, Key=file_key)
-        df = pd.read_excel(io.BytesIO(s3_response['Body'].read()), sheet_name='MASTER (Resource+Intake)', header=0)
+#         # Load the Excel file from S3
+#         s3_response = s3.get_object(Bucket=bucket_name, Key=file_key)
+#         df = pd.read_excel(io.BytesIO(s3_response['Body'].read()), sheet_name='MASTER (Resource+Intake)', header=0)
 
-        return df
+#         return df
 
-    except ClientError as e:
-        print(f"Error accessing DynamoDB or S3: {e}")
-        return None
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return None
+#     except ClientError as e:
+#         print(f"Error accessing DynamoDB or S3: {e}")
+#         return None
+#     except Exception as e:
+#         print(f"An unexpected error occurred: {e}")
+#         return None
     
-df_master = load_excel_from_dynamodb()
+# df_master = load_excel_from_dynamodb()
 
-headings = {
-    "Category": df_master.columns[4:12],  # Columns E-L
-    "Life Cycle": df_master.columns[12:16],  # Columns M-P
-    "Size": df_master.columns[16:23],  # Columns Q-W
-    "Grow Operations": df_master.columns[25:32],  # Columns Y-AF
-    "Construct-New (Land)": df_master.columns[34:37],  # Columns AH-AK
-    "Construct-Existing (Land)": df_master.columns[38:41]  # Columns AL-AO
-}
+# headings = {
+#     "Category": df_master.columns[4:12],  # Columns E-L
+#     "Life Cycle": df_master.columns[12:16],  # Columns M-P
+#     "Size": df_master.columns[16:23],  # Columns Q-W
+#     "Grow Operations": df_master.columns[25:32],  # Columns Y-AF
+#     "Construct-New (Land)": df_master.columns[34:37],  # Columns AH-AK
+#     "Construct-Existing (Land)": df_master.columns[38:41]  # Columns AL-AO
+# }
 
-def filter_excel_data(df, dropdown_selections, checkbox_selections, headings):
-    filtered_df = df
+# def filter_excel_data(df, dropdown_selections, checkbox_selections, headings):
+#     filtered_df = df
 
-    # Apply filtering for dropdown selections
-    for main_heading, selected_subheading in dropdown_selections.items():
-        if selected_subheading:
-            # Get the column based on the headings and subheading selection
-            selected_column = headings[main_heading][
-                list(df.columns.get_loc(col) for col in headings[main_heading]).index(selected_subheading)
-            ]
-            filtered_df = filtered_df[filtered_df[selected_column] == 1]
+#     # Apply filtering for dropdown selections
+#     for main_heading, selected_subheading in dropdown_selections.items():
+#         if selected_subheading:
+#             # Get the column based on the headings and subheading selection
+#             selected_column = headings[main_heading][
+#                 list(df.columns.get_loc(col) for col in headings[main_heading]).index(selected_subheading)
+#             ]
+#             filtered_df = filtered_df[filtered_df[selected_column] == 1]
 
-    # Apply OR logic for checkbox selections
-    or_conditions = []
-    for main_heading, selected_subheadings in checkbox_selections.items():
-        # Map selected checkboxes to their respective columns
-        selected_columns = [
-            headings[main_heading][i]
-            for i, checkbox in enumerate(selected_subheadings) if checkbox
-        ]
-        if selected_columns:
-            or_conditions.append((filtered_df[selected_columns] == 1).any(axis=1))
+#     # Apply OR logic for checkbox selections
+#     or_conditions = []
+#     for main_heading, selected_subheadings in checkbox_selections.items():
+#         # Map selected checkboxes to their respective columns
+#         selected_columns = [
+#             headings[main_heading][i]
+#             for i, checkbox in enumerate(selected_subheadings) if checkbox
+#         ]
+#         if selected_columns:
+#             or_conditions.append((filtered_df[selected_columns] == 1).any(axis=1))
 
-    # Combine all OR conditions across checkbox groups
-    if or_conditions:
-        combined_condition = pd.concat(or_conditions, axis=1).any(axis=1)
-        filtered_df = filtered_df[combined_condition]
+#     # Combine all OR conditions across checkbox groups
+#     if or_conditions:
+#         combined_condition = pd.concat(or_conditions, axis=1).any(axis=1)
+#         filtered_df = filtered_df[combined_condition]
 
-    # Return only the first three columns or a message if no rows match
-    if not filtered_df.empty:
-        return filtered_df.iloc[:, :3].to_dict(orient='records')
-    else:
-        return "No matching records found."
+#     # Return only the first three columns or a message if no rows match
+#     if not filtered_df.empty:
+#         return filtered_df.iloc[:, :3].to_dict(orient='records')
+#     else:
+#         return "No matching records found."
 
 def lambda_handler(event, context):
     data = json.loads(event['body'])
