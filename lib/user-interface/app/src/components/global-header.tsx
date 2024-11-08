@@ -58,12 +58,7 @@ export default function GlobalHeader() {
         identity={{
           href: "/",
           logo: { src: "/images/stateseal-color.png", alt:  CHATBOT_NAME  + " Logo" },
-          title: (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontWeight: 'bold', fontSize: '1.5em', marginRight: '10px' }}>{CHATBOT_NAME}</span>
-              <span style={{ fontSize: '1.2em' }}>Executive Office of Economic Development</span>
-            </div>
-          ),
+          title: `${CHATBOT_NAME} - Executive Office of Economic Development`,
         }}
         utilities={[          
           {
