@@ -1,6 +1,4 @@
-import io
 import os
-from turtle import pd
 import boto3
 from botocore.exceptions import ClientError 
 import json
