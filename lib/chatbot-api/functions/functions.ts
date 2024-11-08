@@ -223,7 +223,7 @@ export class LambdaFunctionStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(30),
         environment: {
           "BUCKET": props.knowledgeBucket.bucketName,
-          "KB_ID": props.knowledgeBase.attrKnowledgeBasseId
+          "KB_ID": props.knowledgeBase.attrKnowledgeBaseId
         },
     });
   
