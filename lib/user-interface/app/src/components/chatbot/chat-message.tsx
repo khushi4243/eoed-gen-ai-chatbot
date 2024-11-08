@@ -230,9 +230,11 @@ export default function ChatMessage(props: ChatMessageProps) {
         </Box>
       )}      
       {props.message?.type === ChatBotMessageType.Human && (
-        <TextContent>
-          <strong>{props.message.content}</strong>
-        </TextContent>
+        <div className={styles.chat_message_container}>
+        <div className={styles.input_message}>
+            {props.message.content}
+        </div>
+    </div>
       )}
     </div>
   );
