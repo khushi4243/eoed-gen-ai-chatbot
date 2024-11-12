@@ -28,11 +28,7 @@ function App() {
         <div style={{ height: "56px", backgroundColor: "#000716" }}>&nbsp;</div>
         <div>
           <Routes>            
-            <Route
-                index
-                path="/"
-                element={<LandingPage />}
-            />        
+            <Route path= "/" element={<LandingPage />} />        
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground/:sessionId" element={<Playground />} />
               <Route path="sessions" element={<SessionPage />} />              
