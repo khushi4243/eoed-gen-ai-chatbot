@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <Container>
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        <Header variant="h2">Welcome to GrantWell</Header>
+        <Header variant="h2">Welcome to BEACON AI</Header>
       </div>
 
       <p style={{ fontSize: '18px', textAlign: 'center', margin: '10px 0 40px' }}>

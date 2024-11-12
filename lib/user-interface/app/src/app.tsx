@@ -31,7 +31,7 @@ function App() {
             <Route
                 index
                 path="/"
-                element={<Navigate to={<Navigate to={`/landing-page/base-page`} replace />} replace />}
+                element={<Navigate to={`/landing-page/base-page`} replace />}
             />        
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground/:sessionId" element={<Playground />} />
