@@ -1,11 +1,15 @@
 import { Container, SpaceBetween, Header, Icon } from '@cloudscape-design/components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   const handleNavigate = (path) => {
     navigate(path);
+
+  const { sessionId } = useParams();
   };
 
 //   return (
@@ -37,7 +41,7 @@ export default function LandingPage() {
           }}
           onClick={() => handleNavigate('/chatbot/playground')}
         >
-          <img src={`${process.env.PUBLIC_URL}/images/resources.png`} alt="Resource Icon" style={{ width: '50px', height: '50px' }} />
+          <Icon name="status-positive" size="large" />
           <h2>Resource Track</h2>
           <p>Explore resources and tools for managing your funding opportunities.</p>
         </div>
@@ -53,7 +57,7 @@ export default function LandingPage() {
           }}
           onClick={() => handleNavigate('/chatbot/playground')}
         >
-          <img src={`${process.env.PUBLIC_URL}/images/inquiries.png`} alt="Inquiries Icon" style={{ width: '50px', height: '50px' }} />
+          <Icon name="status-info" size="large" />
           <h2>Inquiries Track</h2>
           <p>Reach out for support or learn more about our services.</p>
         </div>
