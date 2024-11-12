@@ -31,7 +31,7 @@ function App() {
             <Route
             index 
             path= "/" 
-            element={<LandingPage />} />
+            element={<Navigate to={`/landing-page/base-page`} replace />} />
             <Route path="/landing-page/base-page" element={<Outlet />}>
             <Route path = "" element={<LandingPage />} />
             </Route>        
