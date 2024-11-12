@@ -32,7 +32,9 @@ function App() {
             index 
             path= "/" 
             element={<LandingPage />} />
-            <Route path="/landing-page/base-page" element={<Outlet />}></Route>        
+            <Route path="/landing-page/base-page" element={<Outlet />}>
+            <Route path = "" element={<LandingPage />} />
+            </Route>        
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground/:sessionId" element={<Playground />} />
               <Route path="sessions" element={<SessionPage />} />              
@@ -41,7 +43,7 @@ function App() {
              <Route path="data" element={<DataPage />} />   
              <Route path="user-feedback" element={<UserFeedbackPage />} />                           
             </Route>            
-            <Route path="*" element={<Navigate to={`/chatbot/playground/${uuidv4()}`} replace />} />
+            <Route path="*" element={<Navigate to={`/landing-page/base-page`} replace />} />
           </Routes>
         </div>
       </Router>
