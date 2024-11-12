@@ -11,6 +11,7 @@ export default function LandingPage() {
   return (
     <Header variant="h2">Welcome to BEACON AI</Header>
   )
+}
 
 //   return (
 //     <Container>
