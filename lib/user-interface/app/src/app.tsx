@@ -27,23 +27,23 @@ function App() {
         <GlobalHeader />
         <div style={{ height: "56px", backgroundColor: "#000716" }}>&nbsp;</div>
         <div>
-          <Routes>            
-            <Route
-            index 
-            path= "/" 
-            element={<Navigate to={`/landing-page/base-page`} replace />} />
-            <Route path="/landing-page/base-page" element={<Outlet />}>
-            <Route path = "" element={<LandingPage />} />
-            </Route>        
+        <Routes>
+            {/* Render LandingPage directly at the root */}
+            <Route path="/" element={<LandingPage />} />             
+         
+            {/* Render Chatbot pages under /chatbot */}
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground/:sessionId" element={<Playground />} />
               <Route path="sessions" element={<SessionPage />} />              
             </Route>
+
+            {/* Render Admin pages under /admin */}
             <Route path="/admin" element={<Outlet />}>                 
              <Route path="data" element={<DataPage />} />   
              <Route path="user-feedback" element={<UserFeedbackPage />} />                           
-            </Route>            
-            <Route path="*" element={<Navigate to={`/landing-page/base-page`} replace />} />
+            </Route>     
+                   
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </Router>
