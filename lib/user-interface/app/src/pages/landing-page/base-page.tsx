@@ -1,15 +1,20 @@
+
 import { Container, SpaceBetween, Header, Icon } from '@cloudscape-design/components';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import BaseAppLayout from "../../../components/base-app-layout";
+import Sessions from "../../../components/chatbot/sessions";
 
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   const handleNavigate = (path) => {
+    console.log(path, "Clicked on Resource Track")
     navigate(path);
 
   const { sessionId } = useParams();
+  console.log(sessionId, "session id");
   };
 
 //   return (
