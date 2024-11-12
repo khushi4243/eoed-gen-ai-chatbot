@@ -31,7 +31,8 @@ function App() {
             <Route
             index 
             path= "/" 
-            element={<LandingPage />} />        
+            element={<LandingPage />} />
+            <Route path="/landing-page/base-page" element={<Outlet />}></Route>        
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground/:sessionId" element={<Playground />} />
               <Route path="sessions" element={<SessionPage />} />              
