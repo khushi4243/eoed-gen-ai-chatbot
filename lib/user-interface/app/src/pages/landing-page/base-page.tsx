@@ -35,7 +35,7 @@ export default function LandingPage() {
             backgroundColor: '#e1e4e8',
             width: '250px',
           }}
-          onClick={() => handleNavigate('/chatbot')}
+          onClick={() => handleNavigate('/chatbot/playground')}
         >
           <img src={`${process.env.PUBLIC_URL}/images/resources.png`} alt="Resource Icon" style={{ width: '50px', height: '50px' }} />
           <h2>Resource Track</h2>
@@ -51,7 +51,7 @@ export default function LandingPage() {
             backgroundColor: '#e1e4e8',
             width: '250px',
           }}
-          onClick={() => handleNavigate('/chatbot')}
+          onClick={() => handleNavigate('/chatbot/playground')}
         >
           <img src={`${process.env.PUBLIC_URL}/images/inquiries.png`} alt="Inquiries Icon" style={{ width: '50px', height: '50px' }} />
           <h2>Inquiries Track</h2>
