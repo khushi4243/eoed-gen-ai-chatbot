@@ -1,4 +1,4 @@
-import { Container, SpaceBetween, Header, Link, Icon } from '@cloudscape-design/components';
+import { Container, SpaceBetween, Header, Icon } from '@cloudscape-design/components';
 import { useNavigate } from 'react-router-dom';
 
 export default function LandingPage() {
@@ -10,15 +10,15 @@ export default function LandingPage() {
 
   return (
     <Container>
-      <Header variant="h1" style={{ fontSize: '40px', textAlign: 'center', margin: '20px 0' }}>
-        Welcome to GrantWell
-      </Header>
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        <Header variant="h2">Welcome to GrantWell</Header>
+      </div>
 
       <p style={{ fontSize: '18px', textAlign: 'center', margin: '10px 0 40px' }}>
         Choose an option to get started:
       </p>
 
-      <SpaceBetween size="l" direction="horizontal" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
         <div
           style={{
             textAlign: 'center',
@@ -30,7 +30,7 @@ export default function LandingPage() {
           }}
           onClick={() => handleNavigate('/chatbot')}
         >
-          <Icon name="document" size="large" />
+          <Icon name="status-positive" size="large" />
           <h2>Resource Track</h2>
           <p>Explore resources and tools for managing your funding opportunities.</p>
         </div>
@@ -46,11 +46,11 @@ export default function LandingPage() {
           }}
           onClick={() => handleNavigate('/chatbot')}
         >
-          <Icon name="support" size="large" />
+          <Icon name="status-info" size="large" />
           <h2>Inquiries Track</h2>
           <p>Reach out for support or learn more about our services.</p>
         </div>
-      </SpaceBetween>
+      </div>
     </Container>
   );
 }
