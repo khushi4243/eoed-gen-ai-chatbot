@@ -1,69 +1,101 @@
-
-import { Container, SpaceBetween, Header, Icon } from '@cloudscape-design/components';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Container, Header, Icon } from '@cloudscape-design/components';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-
-
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   const handleNavigate = () => {
     const newSessionId = uuidv4();
-    // Replace `${newSessionId}` in the path with the generated session ID
     navigate(`/chatbot/playground/${newSessionId}`);
   };
 
-//   return (
-//     <Container>
-//       <Header variant="h2">Welcome to BEACON AI</Header>
-//     </Container>
-//   );
-// }
-
   return (
-    <Container>
-      <div style={{ textAlign: 'center', margin: '20px 0' }}>
-        <Header variant="h2">Welcome to BEACON AI</Header>
+    <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
+      {/* Main Header */}
+      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: 'white' }}>
+        <Header variant="h1" className="main-header">
+          Welcome to BEACON AI
+        </Header>
+        <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
+          Empowering Massachusetts State Employees with AI Resources and Support
+        </p>
       </div>
 
-      <p style={{ fontSize: '18px', textAlign: 'center', margin: '10px 0 40px' }}>
-        Choose an option to get started:
-      </p>
+      {/* Subheading */}
+      <div style={{ textAlign: 'center', padding: '20px', color: '#333', marginTop: '30px' }}>
+        <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#001f3f' }}>
+          Select an option below to get started:
+        </p>
+      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+      {/* Action Cards */}
+      <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '40px',
+          marginTop: '20px',
+          padding: '0 20px',
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}
+      >
+        {/* Resource Track */}
         <div
           style={{
-            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             cursor: 'pointer',
-            padding: '20px',
-            borderRadius: '10px',
-            backgroundColor: '#e1e4e8',
-            width: '250px',
+            padding: '50px',
+            borderRadius: '15px',
+            backgroundColor: '#e8f0fa',
+            width: '400px',
+            minHeight: '350px',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
           }}
           onClick={handleNavigate}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
         >
           <Icon name="status-positive" size="large" />
-          <h2>Resource Track</h2>
-          <p>Explore resources and tools for managing your funding opportunities.</p>
+          <h2 style={{ margin: '20px 0', color: '#001f3f', fontWeight: 'bold', fontSize: '28px' }}>
+            Resource Track
+          </h2>
+          <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
+            Explore tools and resources for managing state funding opportunities and advancing Massachusetts communities.
+          </p>
         </div>
 
+        {/* Inquiries Track */}
         <div
           style={{
-            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             cursor: 'pointer',
-            padding: '20px',
-            borderRadius: '10px',
-            backgroundColor: '#e1e4e8',
-            width: '250px',
+            padding: '50px',
+            borderRadius: '15px',
+            backgroundColor: '#e8f0fa',
+            width: '400px',
+            minHeight: '350px',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
           }}
           onClick={handleNavigate}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
         >
-          <Icon name="status-info" size="large" />
-          <h2>Inquiries Track</h2>
-          <p>Reach out for support or learn more about our services.</p>
+          <Icon name="status-info" size="large" color="#001f3f" />
+          <h2 style={{ margin: '20px 0', color: '#001f3f', fontWeight: 'bold', fontSize: '28px' }}>
+            Inquiries Track
+          </h2>
+          <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
+            Reach out for support, guidance, and resources to help you make informed decisions.
+          </p>
         </div>
       </div>
-    </Container>
+    </div>
   );
 }
