@@ -11,14 +11,20 @@ export default function LandingPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
+    <div style={{ 
+        minHeight: '100vh', 
+        padding: '40px 0', 
+        backgroundColor: '#f5f7fa',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center' }}>
       {/* Main Header */}
-      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: 'white' }}>
-        <Header variant="h1" className="main-header">
+      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#d1e3f0', color: 'white' }}>
+        <Header variant="h1">
           Welcome to BEACON AI
         </Header>
         <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
-          Empowering Massachusetts State Employees with AI Resources and Support
+          An AI powered knowledge base for all EOED programs and resources.
         </p>
       </div>
 
@@ -64,7 +70,7 @@ export default function LandingPage() {
             Resource Track
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            Explore tools and resources for managing state funding opportunities and advancing Massachusetts communities.
+            Input key information regarding the business to find programs and resources that match business needs.
           </p>
         </div>
 
@@ -92,7 +98,8 @@ export default function LandingPage() {
             Inquiries Track
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            Reach out for support, guidance, and resources to help you make informed decisions.
+            Utilize the open ended chatbot to inquire about any resources within the Executive Office of
+            Economic Development.
           </p>
         </div>
       </div>
