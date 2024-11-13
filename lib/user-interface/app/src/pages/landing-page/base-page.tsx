@@ -87,7 +87,7 @@ export default function LandingPage() {
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
         >
-          <Icon name="status-info" size="large" color="#001f3f" />
+          <Icon name="status-info" size="large" />
           <h2 style={{ margin: '20px 0', color: '#001f3f', fontWeight: 'bold', fontSize: '28px' }}>
             Inquiries Track
           </h2>
