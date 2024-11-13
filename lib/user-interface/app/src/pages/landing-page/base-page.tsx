@@ -11,20 +11,15 @@ export default function LandingPage() {
   };
 
   return (
-    <div style={{ 
-        minHeight: '100vh', 
-        padding: '40px 0', 
-        backgroundColor: '#f5f7fa',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
       {/* Main Header */}
-      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: '#d1e3f0' }}>
-        <Header variant="h1">
+      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: 'white' }}>
+        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#FFD700', textAlign: 'center' }}>
           Welcome to BEACON AI
-        </Header>
+        </div>
         <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
-          An AI powered knowledge base for all EOED programs and resources.
+          An powered AI knowledge base able to answer any questions regarding resources in the
+          Executive Office of Economic Development.
         </p>
       </div>
 
@@ -70,7 +65,8 @@ export default function LandingPage() {
             Resource Track
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            Input key information regarding the business to find programs and resources that match business needs.
+            Input information regarding businesses to receive grants, programs, and other incentives
+            the business might be eligible for.
           </p>
         </div>
 
@@ -98,8 +94,8 @@ export default function LandingPage() {
             Inquiries Track
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            Utilize the open ended chatbot to inquire about any resources within the Executive Office of
-            Economic Development.
+            An open ended chatbot to answer any inquiries regarding informational resources 
+            and helpful contacts within the Executive Office of Economic Development.
           </p>
         </div>
       </div>
