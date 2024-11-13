@@ -1,20 +1,17 @@
 
 import { Container, SpaceBetween, Header, Icon } from '@cloudscape-design/components';
 import { useNavigate, useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import BaseAppLayout from "../../../components/base-app-layout";
-import Sessions from "../../../components/chatbot/sessions";
 
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
-  const handleNavigate = (path) => {
-    console.log(path, "Clicked on Resource Track")
-    navigate(path);
-
-  const { sessionId } = useParams();
-  console.log(sessionId, "session id");
+  const handleNavigate = () => {
+    const newSessionId = uuidv4();
+    // Replace `${newSessionId}` in the path with the generated session ID
+    navigate(`/chatbot/playground/${newSessionId}`);
   };
 
 //   return (
@@ -44,7 +41,7 @@ export default function LandingPage() {
             backgroundColor: '#e1e4e8',
             width: '250px',
           }}
-          onClick={() => handleNavigate('/chatbot/playground')}
+          onClick={handleNavigate}
         >
           <Icon name="status-positive" size="large" />
           <h2>Resource Track</h2>
@@ -60,7 +57,7 @@ export default function LandingPage() {
             backgroundColor: '#e1e4e8',
             width: '250px',
           }}
-          onClick={() => handleNavigate('/chatbot/playground')}
+          onClick={handleNavigate}
         >
           <Icon name="status-info" size="large" />
           <h2>Inquiries Track</h2>
