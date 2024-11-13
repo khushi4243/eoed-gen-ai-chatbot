@@ -14,7 +14,7 @@ export default function LandingPage() {
     <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
       {/* Main Header */}
       <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: 'white' }}>
-        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#FFD700', textAlign: 'center' }}>
+        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#d1e3f0', textAlign: 'center' }}>
           Welcome to BEACON AI
         </div>
         <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
