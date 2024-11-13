@@ -14,13 +14,13 @@ export default function LandingPage() {
     <div style={{ 
         minHeight: '100vh', 
         padding: '40px 0', 
-        backgroundColor: '#001f3f',
+        backgroundColor: '#f5f7fa',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center' }}>
       {/* Main Header */}
-      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#d1e3f0', color: 'white' }}>
+      <div style={{ textAlign: 'center', padding: '40px 0', backgroundColor: '#001f3f', color: 'white' }}>
         <Header variant="h1">
           Welcome to BEACON AI
         </Header>
