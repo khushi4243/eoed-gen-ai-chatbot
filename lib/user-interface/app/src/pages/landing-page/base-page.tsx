@@ -14,7 +14,8 @@ export default function LandingPage() {
     <div style={{ 
         minHeight: '100vh', 
         padding: '40px 0', 
-        backgroundColor: '#f5f7fa',
+        backgroundColor: '#001f3f',
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center' }}>
