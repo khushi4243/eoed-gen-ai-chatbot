@@ -5,10 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 export default function LandingPage() {
   const navigate = useNavigate();
 
-  const handleNavigate = () => {
+  const handleNavigateChatbot = () => {
     const newSessionId = uuidv4();
     navigate(`/chatbot/playground/${newSessionId}`);
   };
+
+  const handleNavigateDropdown = () => {
+    navigate('/resources-track/resources-page');
+  }
 
   return (
     <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
@@ -56,7 +60,7 @@ export default function LandingPage() {
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
             transition: 'transform 0.2s, box-shadow 0.2s',
           }}
-          onClick={handleNavigate}
+          onClick={handleNavigateDropdown}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
         >
@@ -85,7 +89,7 @@ export default function LandingPage() {
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
             transition: 'transform 0.2s, box-shadow 0.2s',
           }}
-          onClick={handleNavigate}
+          onClick={handleNavigateChatbot}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
         >
