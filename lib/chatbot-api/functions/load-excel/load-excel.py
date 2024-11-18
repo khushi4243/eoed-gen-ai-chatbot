@@ -21,7 +21,7 @@ def retrieve_kb_docs(file_name, knowledge_base_id):
             retrievalQuery={'text': key},
             retrievalConfiguration={
                 'vectorSearchConfiguration': {
-                    'numberOfResults': 20
+                    'numberOfResults': 1  # We only want the relevant document
                 }
             }
         )

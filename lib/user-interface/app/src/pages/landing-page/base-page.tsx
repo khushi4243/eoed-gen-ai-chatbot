@@ -11,8 +11,14 @@ export default function LandingPage() {
   };
 
   const handleNavigateDropdown = () => {
-    navigate('/resources-track/resources-page');
-  }
+    try {
+      navigate('/resources-track/resources-page');
+      setError(null); // Clear any previous errors
+    } catch (err) {
+      console.error("Navigation error:", err);
+      setError("Failed to navigate to resources.");
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', padding: '40px 0', backgroundColor: '#f5f7fa' }}>
@@ -106,3 +112,7 @@ export default function LandingPage() {
     </div>
   );
 }
+function setError(arg0: string) {
+  throw new Error(arg0);
+}
+

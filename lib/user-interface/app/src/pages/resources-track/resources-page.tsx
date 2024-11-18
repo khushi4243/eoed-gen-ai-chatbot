@@ -50,6 +50,7 @@ const ResourcesPage: React.FC = () => {
         // Use the getDocuments() method to fetch data
         const response = await knowledgeManagementClient.getDocuments();
         const excelData: DataRow[] = response.data; // Ensure response.data contains the Excel rows
+        console.log("Fetched data:", excelData);
 
         setData(excelData);
       } catch (err) {
