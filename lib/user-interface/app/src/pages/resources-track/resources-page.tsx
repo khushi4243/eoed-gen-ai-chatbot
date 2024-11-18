@@ -1,137 +1,179 @@
-import React, { useState } from 'react';
-import AWS from 'aws-sdk';
+import React, { useState, useEffect, useContext } from 'react';
+import { ApiClient } from '../../common/api-client/api-client'; // Import the ApiClient
+import { AppContext } from "../../common/app-context";
+import '../../styles/resources.css';
 
+interface Dropdowns {
+  [key: string]: string;
+}
 
-function FilterComponent() {
-  // Define headings with column indexes as per your Excel structure
-  const headings = {
-    Category: { start: 4, end: 12 },
-    LifeCycle: { start: 12, end: 16 },
-    Size: { start: 16, end: 23 },
-    GrowOperations: { start: 25, end: 32 },
-    ConstructNew: { start: 34, end: 37 },
-    ConstructExisting: { start: 38, end: 41 },
-  };
+interface Checkboxes {
+  [key: string]: boolean[];
+}
 
-  const [dropdowns, setDropdowns] = useState({ LifeCycle: '', Size: '' });
-  const [checkboxes, setCheckboxes] = useState({
-    Category: new Array(8).fill(false),
-    GrowOperations: new Array(7).fill(false),
-    ConstructNew: new Array(3).fill(false),
-    ConstructExisting: new Array(3).fill(false),
+type DataRow = any[]; // Replace with a specific type if you know the structure of rows.
+
+const App: React.FC = () => {
+  // Access the AppContext and create an instance of the ApiClient  
+  const appContext = useContext(AppContext)
+  const apiClient = new ApiClient(appContext);
+
+  // States for dropdowns, checkboxes, raw data, and filtered data
+  const [data, setData] = useState<DataRow[]>([]); // Raw data from backend
+  const [dropdowns, setDropdowns] = useState<Dropdowns>({ "Life Cycle": '', Size: '' });
+  const [checkboxes, setCheckboxes] = useState<Checkboxes>({
+    Category: new Array(9).fill(false),
+    "Grow Operations": new Array(7).fill(false),
+    "Construct-New (Land)": new Array(3).fill(false),
+    "Construct-Existing (Land)": new Array(3).fill(false),
   });
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState<DataRow[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDropdownChange = (event, heading) => {
-    setDropdowns({ ...dropdowns, [heading]: event.target.value });
+  // Fetch the Excel data from the S3 bucket via the ApiClient on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Access the KnowledgeManagementClient via ApiClient
+        const knowledgeManagementClient = apiClient.knowledgeManagement;
+
+        // Use the getDocuments() method to fetch data
+        const response = await knowledgeManagementClient.getDocuments();
+        const excelData: DataRow[] = response.data; // Ensure response.data contains the Excel rows
+
+        setData(excelData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [apiClient]);
+
+  // Handle dropdown changes
+  const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>, key: string) => {
+    setDropdowns(prev => ({ ...prev, [key]: event.target.value }));
   };
 
-  const handleCheckboxChange = (index, heading) => {
-    const updatedCheckboxes = { ...checkboxes };
-    updatedCheckboxes[heading][index] = !updatedCheckboxes[heading][index];
-    setCheckboxes(updatedCheckboxes);
+  // Handle checkbox changes
+  const handleCheckboxChange = (index: number, key: string) => {
+    setCheckboxes(prev => {
+      const updated = [...prev[key]];
+      updated[index] = !updated[index];
+      return { ...prev, [key]: updated };
+    });
   };
 
+  // Filter data based on user inputs
   const filterData = () => {
-    let filtered = data;
+    let filtered = [...data];
 
-    // Filter for dropdown selections (LifeCycle and Size)
-    Object.entries(dropdowns).forEach(([heading, value]) => {
+    // Apply dropdown filtering
+    Object.entries(dropdowns).forEach(([key, value]) => {
       if (value) {
-        const colIndex = headings[heading].start + dropdowns[heading];
+        // Adjust logic based on your data structure
+        const colIndex = parseInt(value, 10); // Replace with correct logic
         filtered = filtered.filter(row => row[colIndex] === 1);
       }
     });
 
-    // OR logic for checkbox selections
-    const orConditions = [];
-    Object.entries(checkboxes).forEach(([heading, values]) => {
-      const selectedColumns = values.map((isSelected, idx) => 
-        isSelected ? headings[heading].start + idx : -1
-      ).filter(idx => idx !== -1);
+    // Apply checkbox OR logic
+    Object.entries(checkboxes).forEach(([key, values]) => {
+      const selectedColumns = values
+        .map((checked, idx) => (checked ? idx : -1)) // Replace with correct index logic
+        .filter(idx => idx !== -1);
 
       if (selectedColumns.length) {
-        const condition = row => selectedColumns.some(colIndex => row[colIndex] === 1);
-        orConditions.push(filtered.filter(condition));
+        filtered = filtered.filter(row =>
+          selectedColumns.some(colIndex => row[colIndex] === 1)
+        );
       }
     });
 
-    // Apply OR conditions
-    const combinedFiltered = orConditions.length
-      ? filtered.filter(row => orConditions.some(condition => condition(row)))
-      : filtered;
-
-    setFilteredData(combinedFiltered.slice(0, 3)); // Display only the first three columns
+    setFilteredData(filtered);
   };
 
+  // Display loading and error states
+  if (isLoading) return <p>Loading data...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
-    <div className="filter-container">
-      <h2>Business Category (Select Multiple):</h2>
-      <div className="checkbox-section">
-        {checkboxes.Category.map((isChecked, index) => (
-          <label key={index}>
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => handleCheckboxChange(index, "Category")}
-            />
-            {`Category ${index + 1}`}
-          </label>
-        ))}
+    <div className="App">
+      <h1>Filter Grants and Programs</h1>
+
+      <div className="filter-section">
+        <h2>Business Category</h2>
+        <div className="checkbox-group">
+          {checkboxes.Category.map((checked, idx) => (
+            <label key={idx}>
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => handleCheckboxChange(idx, "Category")}
+              />
+              {`Category ${idx + 1}`}
+            </label>
+          ))}
+        </div>
+
+        <h2>Life Cycle</h2>
+        <select
+          value={dropdowns["Life Cycle"]}
+          onChange={(e) => handleDropdownChange(e, "Life Cycle")}
+        >
+          <option value="">Select...</option>
+          <option value="0">Startup</option>
+          <option value="1">Growth</option>
+        </select>
+
+        <h2>Size</h2>
+        <select
+          value={dropdowns.Size}
+          onChange={(e) => handleDropdownChange(e, "Size")}
+        >
+          <option value="">Select...</option>
+          <option value="0">Small</option>
+          <option value="1">Large</option>
+        </select>
+
+        <h2>Grow Operations</h2>
+        <div className="checkbox-group">
+          {checkboxes["Grow Operations"].map((checked, idx) => (
+            <label key={idx}>
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => handleCheckboxChange(idx, "Grow Operations")}
+              />
+              {`Grow Operation ${idx + 1}`}
+            </label>
+          ))}
+        </div>
+        {/* Add sections for other categories as needed */}
       </div>
 
-      <h2>Life Cycle (Select One):</h2>
-      <select value={dropdowns.LifeCycle} onChange={(e) => handleDropdownChange(e, "LifeCycle")}>
-        <option value="">Select...</option>
-        {/* Replace these options with your real data */}
-        <option value="0">Startup</option>
-        <option value="1">Growth</option>
-      </select>
-
-      <h2>Size (Select One):</h2>
-      <select value={dropdowns.Size} onChange={(e) => handleDropdownChange(e, "Size")}>
-        <option value="">Select...</option>
-        {/* Replace these options with your real data */}
-        <option value="0">Small</option>
-        <option value="1">Large</option>
-      </select>
-
-      <h2>Grow Operations (Select Multiple):</h2>
-      <div className="checkbox-section">
-        {checkboxes.GrowOperations.map((isChecked, index) => (
-          <label key={index}>
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => handleCheckboxChange(index, "GrowOperations")}
-            />
-            {`Grow Operation ${index + 1}`}
-          </label>
-        ))}
-      </div>
-
-      {/* Add additional checkbox sections for ConstructNew and ConstructExisting */}
-
-      <div className="button-section">
-        <button onClick={filterData} style={{ padding: '10px 20px', fontWeight: 'bold', backgroundColor: '#4CAF50', color: 'white' }}>
-          🔍 Filter Results
-        </button>
-      </div>
+      <button onClick={filterData}>Filter Results</button>
 
       <div className="output-section">
-        {filteredData.length ? (
+        {filteredData.length > 0 ? (
           <table>
             <thead>
               <tr>
-                {/* Display only the first three columns for filtered data */}
                 <th>Column 1</th>
                 <th>Column 2</th>
                 <th>Column 3</th>
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((row, index) => (
-                <tr key={index}>
+              {filteredData.map((row, idx) => (
+                <tr key={idx}>
                   <td>{row[0]}</td>
                   <td>{row[1]}</td>
                   <td>{row[2]}</td>
@@ -145,6 +187,6 @@ function FilterComponent() {
       </div>
     </div>
   );
-}
+};
 
-export default FilterComponent;
+export default App;
