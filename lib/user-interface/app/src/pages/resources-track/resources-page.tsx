@@ -11,9 +11,15 @@ interface Checkboxes {
   [key: string]: boolean[];
 }
 
-type DataRow = any[]; // Replace with a specific type if you know the structure of rows.
+interface DataRow {
+  // Define the structure of DataRow based on your data
+  id: number;
+  name: string;
+  value: string;
+  // Add other fields as necessary
+}
 
-const App: React.FC = () => {
+const ResourcesPage: React.FC = () => {
   // Access the AppContext and create an instance of the ApiClient  
   const appContext = useContext(AppContext)
   const apiClient = new ApiClient(appContext);
@@ -189,4 +195,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default ResourcesPage;
