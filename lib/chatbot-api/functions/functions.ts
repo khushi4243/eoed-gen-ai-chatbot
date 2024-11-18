@@ -30,6 +30,7 @@ export class LambdaFunctionStack extends cdk.Stack {
   public readonly uploadS3Function : lambda.Function;
   public readonly syncKBFunction : lambda.Function;
   metadataHandlerFunction: cdk.aws_lambda.Function;
+  excelRetrieverFunction: cdk.aws_lambda.Function;
 
   // add the system prompt and configurations 
   
@@ -255,6 +256,34 @@ export class LambdaFunctionStack extends cdk.Stack {
           events: [s3.EventType.OBJECT_CREATED],
         }));
     
-  }
+    const excelRetrieverFunction = new lambda.Function(scope, 'ExcelRetrieverFunction', {
+      runtime: lambda.Runtime.PYTHON_3_9, // Adjust runtime as needed
+      code: lambda.Code.fromAsset(path.join(__dirname, 'load-excel')), // Path to your Lambda code
+      handler: 'lambda_function.lambda_handler', 
+      timeout: cdk.Duration.seconds(60),
+      environment: {
+        "BUCKET": props.knowledgeBucket.bucketName,
+        "KB_ID": props.knowledgeBase.attrKnowledgeBaseId
+      },
+    });
+
+    excelRetrieverFunction.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        's3:GetObject',
+        's3:ListBucket',
+        'bedrock:Retrieve',
+      ],
+      resources: [
+        props.knowledgeBucket.bucketArn,               // Grants access to the bucket itself (for actions like ListBucket)
+        props.knowledgeBucket.bucketArn + "/*" ,        // Grants access to all objects within the bucket
+        'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0',  // Add the Bedrock model resource explicitly
+        props.knowledgeBase.attrKnowledgeBaseArn,
+
+      ]
+    }));
+
+    this.excelRetrieverFunction = excelRetrieverFunction;
+  } 
   }
  
