@@ -14,7 +14,7 @@ import DataPage from "./pages/admin/data-view-page";
 import UserFeedbackPage from "./pages/admin/user-feedback-page";
 import SessionPage from "./pages/chatbot/sessions/sessions"
 import LandingPage from './pages/landing-page/base-page';
-import { v4 as uuidv4 } from "uuid";
+import ResourcesPage from './pages/resources-track/resources-page';
 import "./styles/app.scss";
 
 function App() {
@@ -29,7 +29,10 @@ function App() {
         <div>
         <Routes>
             {/* Render LandingPage directly at the root */}
-            <Route path="/" element={<LandingPage />} />             
+            <Route path="/" element={<LandingPage />} />  
+
+            {/* Render Resources page */}
+            <Route path="/resources" element={<ResourcesPage />} />          
          
             {/* Render Chatbot pages under /chatbot */}
             <Route path="/chatbot" element={<Outlet />}>
