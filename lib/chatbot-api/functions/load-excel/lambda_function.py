@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
     # Initialize boto3 clients
+    logger.info("Lambda function has been invoked.")
     bedrock = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
     s3 = boto3.client('s3')
     kb_id = os.getenv('KB_ID', None)
