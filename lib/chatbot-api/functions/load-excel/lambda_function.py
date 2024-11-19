@@ -144,4 +144,4 @@ def process_excel_data(df):
         'records': records
     }
 
-    return data
+    return json.dumps(data)
