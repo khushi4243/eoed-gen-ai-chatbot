@@ -2,11 +2,15 @@ import json
 import boto3
 import pandas as pd
 from io import BytesIO
+import logging
 import os
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
-    # Initialize boto3 clients
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    
+    logger.info("Lambda function has been invoked.")
     bedrock = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
     s3 = boto3.client('s3')
     kb_id = os.getenv('KB_ID', None)
@@ -20,13 +24,24 @@ def lambda_handler(event, context):
         print(f"File retrieved and saved to {local_path}")
 
         # Read the Excel file
-        df = pd.read_excel(local_path, header=[0,1])  # Adjust header rows if necessary
+        df = pd.read_excel(local_path, header=[0, 1])  # Adjust header rows if necessary
         print(df.head())  # For debugging
 
         # Process the DataFrame into the desired format
         data = process_excel_data(df)
 
         # Return the data as a JSON response
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',  # Adjust as necessary
+                'Content-Type': 'application/json'
+            },
+            'body': json.dumps(data)
+        }
+
+    except Exception as e:
+        print(f"Failed to retrieve or process file: {e}")
         return {
             'statusCode': 500,
             'headers': {
@@ -36,12 +51,6 @@ def lambda_handler(event, context):
             'body': json.dumps(f"Failed to retrieve or process file: {str(e)}")
         }
 
-    except Exception as e:
-        print(f"Failed to retrieve or process file: {e}")
-        return {
-            'statusCode': 500,
-            'body': json.dumps(f"Failed to retrieve or process file: {str(e)}")
-        }
 
 def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
     try:
@@ -52,10 +61,12 @@ def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
             retrievalQuery={'text': key},
             retrievalConfiguration={
                 'vectorSearchConfiguration': {
-                    'numberOfResults': 1  # We only want the most relevant document
+                    'numberOfResults': 5  # We only want the most relevant document
                 }
             }
         )
+        
+        print(f"Retrieve API Response: {response}")
 
         file_uri = None
         if response.get('retrievalResults'):
