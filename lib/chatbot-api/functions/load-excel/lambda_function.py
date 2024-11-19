@@ -28,12 +28,12 @@ def lambda_handler(event, context):
 
         # Return the data as a JSON response
         return {
-            'statusCode': 200,
+            'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Origin': '*',  # Adjust as necessary
                 'Content-Type': 'application/json'
             },
-            'body': json.dumps(data)
+            'body': json.dumps(f"Failed to retrieve or process file: {str(e)}")
         }
 
     except Exception as e:
