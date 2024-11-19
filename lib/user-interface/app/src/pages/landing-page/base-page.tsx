@@ -1,9 +1,11 @@
 import { Container, Header, Icon } from '@cloudscape-design/components';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   const handleNavigateChatbot = () => {
     const newSessionId = uuidv4();
@@ -13,7 +15,7 @@ export default function LandingPage() {
   const handleNavigateDropdown = () => {
     try {
       navigate('/resources-track/resources-page');
-      setError(null); // Clear any previous errors
+      setError(null); 
     } catch (err) {
       console.error("Navigation error:", err);
       setError("Failed to navigate to resources.");
@@ -111,8 +113,5 @@ export default function LandingPage() {
       </div>
     </div>
   );
-}
-function setError(arg0: string) {
-  throw new Error(arg0);
 }
 

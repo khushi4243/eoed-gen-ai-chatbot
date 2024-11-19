@@ -36,31 +36,3 @@ export class LoadExcelClient {
         }
     }
 }
-    // async loadExcel(fileName: string, fileType : string): Promise<string> {    
-    //     if (!fileType) {
-    //         alert('Must have valid file type!');
-    //         return;
-    //     }
-
-    //     try {
-    //         const auth = await Utils.authenticate();
-    //         const response = await fetch(this.API + '/signed-url', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization' : auth
-    //             },
-    //             body: JSON.stringify({ fileName, fileType })
-    //         });
-
-    //         if (!response.ok) {
-    //             throw new Error('Failed to get upload URL');
-    //         }
-
-    //         const data = await response.json();
-    //         return data.signedUrl;
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //         throw error;
-    //     }
-    // }
