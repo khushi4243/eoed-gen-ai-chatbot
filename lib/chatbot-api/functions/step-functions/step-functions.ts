@@ -223,19 +223,6 @@ export class StepFunctionsStack extends Construct {
             lambdaFunction: this.splitEvalTestCasesFunction,
             outputPath: '$.Payload',
           });
-      
-        // const evaluateTestCasesTask = new tasks.LambdaInvoke(this, 'Evaluate Test Cases', {
-        // lambdaFunction: this.llmEvalFunction,
-        // outputPath: '$.Payload',
-        // });
-
-        // const evaluateTestCasesTask = new tasks.LambdaInvoke(this, 'Evaluate Test Cases', {
-        //     lambdaFunction: this.llmEvalFunction,
-        //     payload: stepfunctions.TaskInput.fromObject({
-        //         'chunk_key.$': '$',
-        //     }),
-        //     outputPath: '$.Payload',
-        // });
 
         const evaluateTestCasesTask = new tasks.LambdaInvoke(this, 'Evaluate Test Cases', {
             lambdaFunction: this.llmEvalFunction,
@@ -245,13 +232,7 @@ export class StepFunctionsStack extends Construct {
             // }),
             outputPath: '$.Payload',
         });
-      
-        // const processTestCasesMap = new stepfunctions.Map(this, 'Process Test Cases', {
-        // itemsPath: '$.chunks',
-        // maxConcurrency: 5,
-        // resultPath: '$.ProcessedResults'
-        // });
-        // processTestCasesMap.itemProcessor(evaluateTestCasesTask);
+
 
         const processTestCasesMap = new stepfunctions.Map(this, 'Process Test Cases', {
             itemsPath: '$.chunk_keys',
