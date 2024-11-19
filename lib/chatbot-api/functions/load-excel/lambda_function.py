@@ -1,6 +1,7 @@
 import json
 import boto3
 import pandas as pd
+import numpy as np
 from io import BytesIO
 import logging
 import os
@@ -97,6 +98,8 @@ def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
 
 
 def process_excel_data(df):
+
+    df = df.replace({np.nan: None})
     # This function processes the DataFrame and returns data in the desired format
 
     # Initialize dictionaries to hold dropdown and checkbox options
