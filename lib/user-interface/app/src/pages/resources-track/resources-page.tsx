@@ -23,38 +23,39 @@ const ResourcesPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-
+  
       try {
-        // Use the loadExcelData method from LoadExcelClient
+        // Fetch data from the backend
         const jsonData = await loadExcelClient.loadExcelData();
-
+  
         console.log("Fetched data:", jsonData);
-
-        // Update state with fetched data
+  
+        // Ensure dropdowns, checkboxes, and records are valid
         const validDropdowns = jsonData.dropdowns || {};
         const validCheckboxes = jsonData.checkboxes || {};
         const validRecords = jsonData.records || [];
-
+  
         setData(validRecords);
         setDropdownOptions(validDropdowns);
         setCheckboxOptions(validCheckboxes);
-
-        // Initialize dropdowns and checkboxes state
+  
+        // Initialize dropdowns state
         const initialDropdowns: { [key: string]: string } = {};
-        Object.keys(jsonData.dropdowns).forEach((key) => {
+        Object.keys(validDropdowns).forEach((key) => {
           initialDropdowns[key] = ''; // Set initial value to empty string
         });
         setDropdowns(initialDropdowns);
-
+  
+        // Initialize checkboxes state
         const initialCheckboxes: any = {};
-        for (const [key, options] of Object.entries(jsonData.checkboxes)) {
+        Object.entries(validCheckboxes).forEach(([key, options]) => {
           initialCheckboxes[key] = {};
           (options as string[]).forEach((option: string) => {
             initialCheckboxes[key][option] = false;
           });
-        }
+        });
         setCheckboxes(initialCheckboxes);
-
+  
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load data.");
@@ -62,9 +63,10 @@ const ResourcesPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, [loadExcelClient]);
+  
 
   // Handle dropdown changes
   const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>, key: string) => {
