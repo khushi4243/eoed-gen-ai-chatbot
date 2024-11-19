@@ -31,9 +31,13 @@ const ResourcesPage: React.FC = () => {
         console.log("Fetched data:", jsonData);
 
         // Update state with fetched data
-        setData(jsonData.records);
-        setDropdownOptions(jsonData.dropdowns);
-        setCheckboxOptions(jsonData.checkboxes);
+        const validDropdowns = jsonData.dropdowns || {};
+        const validCheckboxes = jsonData.checkboxes || {};
+        const validRecords = jsonData.records || [];
+
+        setData(validRecords);
+        setDropdownOptions(validDropdowns);
+        setCheckboxOptions(validCheckboxes);
 
         // Initialize dropdowns and checkboxes state
         const initialDropdowns: { [key: string]: string } = {};
