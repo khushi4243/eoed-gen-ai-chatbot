@@ -15,6 +15,7 @@ export class LoadExcelClient {
                 method: 'POST',  // Change to 'GET' if your API expects GET
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': auth
                 }
             });
 
