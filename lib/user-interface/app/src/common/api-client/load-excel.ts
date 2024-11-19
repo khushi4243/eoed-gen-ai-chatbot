@@ -22,9 +22,7 @@ export class LoadExcelClient {
             console.log('Response Headers:', response.headers);
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Response Error Body:', errorText);
-                throw new Error(`Failed to fetch Excel data: ${response.status} ${response.statusText}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
