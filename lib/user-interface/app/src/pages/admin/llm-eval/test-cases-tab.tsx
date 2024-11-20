@@ -16,6 +16,9 @@ import {
   import { Utils } from "../../../common/utils";
   import { FileUploader } from "../../../common/file-uploader";
   import { useNavigate } from "react-router-dom";
+  import { saveAs } from 'file-saver';
+  import { useNotifications } from "../../../components/notif-manager";
+
   
   
   const fileExtensions = new Set([
@@ -46,6 +49,8 @@ import {
     const [currentFileName, setCurrentFileName] = useState<string>("");
     const [uploadPanelDismissed, setUploadPanelDismissed] =
       useState<boolean>(false);
+      const [loading, setLoading] = useState(true);
+    const { addNotification } = useNotifications();
   
     const onSetFiles = (files: File[]) => {
       const errors: string[] = [];
@@ -145,6 +150,30 @@ import {
       typeof props.data.workspace?.value !== "undefined" &&
       typeof props.selectedWorkspace !== "undefined" &&
       props.selectedWorkspace.status === "ready";*/
+
+      const handleDownload = async () => {    
+        setLoading(true);
+        try {
+          // download testCaseTemplate.csv
+          const fileName = 'testCaseTemplate.csv';
+          const downloadUrl = await apiClient.evaluations.getDownloadURL(fileName);
+
+          // Fetch the file data
+          const response = await fetch(downloadUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to download file: ${fileName}`);
+          }
+          const blob = await response.blob();
+
+          saveAs(blob, fileName.substring(fileName.lastIndexOf('/') + 1));
+          addNotification('success', 'Files downloaded successfully');
+        } catch (error) {
+          console.error('Error downloading files:', error);
+          addNotification('error', 'Error downloading files');
+        } finally {
+          setLoading(false);
+        }
+      };
   
     return (
       <Form
@@ -168,15 +197,23 @@ import {
       >
         <SpaceBetween size="s">
         <Container header={<h3>Test Case File Format Requirements</h3>}>
-            <SpaceBetween size="xxs">
+          <Button variant="normal" onClick={handleDownload}>
+            Download Template Test Case File
+          </Button>
+          <SpaceBetween size="xxs">
             <p>Please ensure that your test case files follow the format below:</p>
-            {/* <ul> */}
-                <li>File must be in CSV format with a .csv extension.</li>
-                <li>File must include a header in the first row with the columns <strong>question</strong>, <strong>expectedResponse</strong></li>
-                <li>Each subsequent row should represent a single test case, with appropriate values in each column.</li>
-                <li>File size should not exceed 100MB.</li>
-            {/* </ul> */}
-            </SpaceBetween>
+            <ul>
+              <li>File must be in CSV format with a .csv extension.</li>
+              <li>
+                File must include a header in the first row with the columns{" "}
+                <strong>question</strong>, <strong>expectedResponse</strong>
+              </li>
+              <li>
+                Each subsequent row should represent a single test case, with appropriate values in each column.
+              </li>
+              <li>File size should not exceed 100MB.</li>
+            </ul>
+          </SpaceBetween>
         </Container>
           <Container>
             <SpaceBetween size="l">

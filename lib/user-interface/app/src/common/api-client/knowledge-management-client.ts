@@ -11,10 +11,14 @@ export class KnowledgeManagementClient {
     this.API = _appConfig.httpEndpoint.slice(0,-1);
   }
   
-  // Returns a URL from the this.API that allows one file upload to S3 with that exact filename
-  async getUploadURL(fileName: string, fileType : string): Promise<string> {    
-    if (!fileType) {
-      alert('Must have valid file type!');
+  // Generalized method to get signed URLs for upload or download
+  async getSignedURL(
+    fileName: string,
+    operation: 'upload' | 'download',
+    fileType?: string
+  ): Promise<string> {
+    if (operation === 'upload' && !fileType) {
+      alert('Must have valid file type for upload!');
       return;
     }
 
@@ -24,13 +28,13 @@ export class KnowledgeManagementClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization' : auth
+          'Authorization': auth,
         },
-        body: JSON.stringify({ fileName, fileType })
+        body: JSON.stringify({ fileName, fileType, operation }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get upload URL');
+        throw new Error('Failed to get signed URL');
       }
 
       const data = await response.json();
@@ -39,6 +43,14 @@ export class KnowledgeManagementClient {
       console.error('Error:', error);
       throw error;
     }
+  }
+
+  async getUploadURL(fileName: string, fileType: string): Promise<string> {
+    return this.getSignedURL(fileName, 'upload', fileType);
+  }
+
+  async getDownloadURL(fileName: string): Promise<string> {
+    return this.getSignedURL(fileName, 'download');
   }
 
   // Returns a list of documents in the S3 bucket (hard-coded on the backend)
