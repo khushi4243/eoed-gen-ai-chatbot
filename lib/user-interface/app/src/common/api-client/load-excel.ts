@@ -10,27 +10,25 @@ export class LoadExcelClient {
 
     async loadExcelData(): Promise<any> {
         try {
-            const auth = await Utils.authenticate();
-            const response = await fetch(this.API + '/get-excel-data', {
-                method: 'POST',  // Change to 'GET' if your API expects GET
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': auth
-                }
-            });
-
-            console.log('Response Status:', response.status);
-            console.log('Response Headers:', response.headers);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+          const response = await fetch(
+            'https://q4wnotmlm0.execute-api.us-east-1.amazonaws.com/get-excel-data',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
             }
-
-            const data = await response.json();
-            return data;
+          );
+      
+          if (!response.ok) {
+            console.error('API Error:', response.status, response.statusText);
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+          }
+      
+          const data = await response.json();
+          console.log('API Response Data:', data);
+          return data;
         } catch (error) {
-            console.error('Error fetching Excel data:', error);
-            throw error;
+          console.error('Error in loadExcelData:', error.message);
+          throw error; // Propagate error to caller
         }
-    }
+      }
 }

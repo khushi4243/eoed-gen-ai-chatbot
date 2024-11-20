@@ -23,29 +23,28 @@ const ResourcesPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-  
+
       try {
-        // Fetch data from the backend
         const jsonData = await loadExcelClient.loadExcelData();
-  
+
         console.log("Fetched data:", jsonData);
-  
+
         // Ensure dropdowns, checkboxes, and records are valid
         const validDropdowns = jsonData.dropdowns || {};
         const validCheckboxes = jsonData.checkboxes || {};
         const validRecords = jsonData.records || [];
-  
+
         setData(validRecords);
         setDropdownOptions(validDropdowns);
         setCheckboxOptions(validCheckboxes);
-  
+
         // Initialize dropdowns state
         const initialDropdowns: { [key: string]: string } = {};
         Object.keys(validDropdowns).forEach((key) => {
           initialDropdowns[key] = ''; // Set initial value to empty string
         });
         setDropdowns(initialDropdowns);
-  
+
         // Initialize checkboxes state
         const initialCheckboxes: any = {};
         Object.entries(validCheckboxes).forEach(([key, options]) => {
@@ -55,7 +54,7 @@ const ResourcesPage: React.FC = () => {
           });
         });
         setCheckboxes(initialCheckboxes);
-  
+
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load data.");
@@ -63,7 +62,7 @@ const ResourcesPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchData();
   }, [loadExcelClient]);
   
