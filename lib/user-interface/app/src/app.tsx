@@ -32,9 +32,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />  
 
             {/* Render Resources page */}
-            <Route path="/resources-track" element={<Outlet />} >
-              <Route path="/resources-page" element={<ResourcesPage />} />
-            </Route>               
+            <Route path="/resources-track/resources-page" element={<Outlet />} />          
          
             {/* Render Chatbot pages under /chatbot */}
             <Route path="/chatbot" element={<Outlet />}>

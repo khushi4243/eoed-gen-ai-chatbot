@@ -17,7 +17,7 @@ export class LoadExcelClient {
               method: 'GET',
               headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+ auth,
+                'Authorization': 'Bearer ' + auth,
             },
             }
           );
