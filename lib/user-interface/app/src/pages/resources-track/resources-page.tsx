@@ -41,7 +41,7 @@ const ResourcesPage: React.FC = () => {
         // Initialize dropdowns state
         const initialDropdowns: { [key: string]: string } = {};
         Object.keys(validDropdowns).forEach((key) => {
-          initialDropdowns[key] = ''; // Set initial value to empty string
+          initialDropdowns[key] = ' '; // Set initial value to empty string
         });
         setDropdowns(initialDropdowns);
 
@@ -59,6 +59,7 @@ const ResourcesPage: React.FC = () => {
         console.error("Error fetching data:", err);
         setError("Failed to load data.");
       } finally {
+        console.log("chaning load status")
         setIsLoading(false);
       }
     };
@@ -109,8 +110,8 @@ const ResourcesPage: React.FC = () => {
   };
 
   // Display loading and error states
-  if (isLoading) return <p>Loading data...</p>;
-  if (error) return <p>{error}</p>;
+  // if (isLoading) return <p>Loading data...</p>;
+  // if (error) return <p>{error}</p>;
 
   return (
     <div className="App">
