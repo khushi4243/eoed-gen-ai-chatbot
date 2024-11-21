@@ -55,6 +55,8 @@ const ResourcesPage: React.FC = () => {
 
         setDropdownOptions(transformedDropdowns);
 
+        
+
         // Initialize dropdown states
         const initialDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
           acc[key] = null; // Set default value to null
@@ -95,6 +97,10 @@ const ResourcesPage: React.FC = () => {
 
     setFilteredData(filtered);
   };
+
+  console.log('Data:', data);
+  console.log('Dropdown Options:', dropdownOptions);
+  console.log('Filtered Data:', filteredData);
 
   // Display loading or error states
   if (isLoading) return <p>Loading data...</p>;
