@@ -33,6 +33,7 @@ const ResourcesPage: React.FC = () => {
       setError(null);
 
       try {
+        console.log('Fetching data...');
         const jsonData = await loadExcelClient.loadExcelData();
 
         console.log('Fetched data:', jsonData);
@@ -65,6 +66,7 @@ const ResourcesPage: React.FC = () => {
         console.error('Error fetching data:', err);
         setError('Failed to load data.');
       } finally {
+        console.log('Setting loading to false...');
         setIsLoading(false);
       }
     };
