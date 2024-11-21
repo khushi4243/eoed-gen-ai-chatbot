@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { AppContext } from '../../common/app-context';
 import { LoadExcelClient } from '../../common/api-client/load-excel';
 import {
@@ -12,14 +12,11 @@ import {
 } from '@cloudscape-design/components';
 import '../../styles/resources.css';
 
-
 const ResourcesPage: React.FC = () => {
-  // Access AppContext and create an instance of LoadExcelClient
   const appContext = useContext(AppContext);
-  const loadExcelClient = new LoadExcelClient(appContext);
+  const loadExcelClient = useMemo(() => new LoadExcelClient(appContext), [appContext]);
 
-  // State Management
-  const [data, setData] = useState<any[]>([]); // Raw data records
+  const [data, setData] = useState<any[]>([]);
   const [dropdownOptions, setDropdownOptions] = useState<{ [key: string]: { label: string; value: string }[] }>({});
   const [dropdowns, setDropdowns] = useState<{ [key: string]: { label: string; value: string } | null }>({});
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -38,15 +35,18 @@ const ResourcesPage: React.FC = () => {
 
         console.log('Fetched data:', jsonData);
 
-        // Extract dropdown options
-        const validDropdowns = jsonData.dropdowns || {};
+        // Extract dropdown options from checkboxes
+        const validCheckboxes = jsonData.checkboxes || {};
         const validRecords = jsonData.records || [];
+
+        console.log('Valid Checkboxes:', validCheckboxes);
+        console.log('Valid Records:', validRecords);
 
         setData(validRecords);
 
-        // Transform dropdown options for Cloudscape Select
-        const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
-          acc[key] = validDropdowns[key].map((option: string) => ({
+        // Transform checkbox options for Cloudscape Select
+        const transformedDropdowns = Object.keys(validCheckboxes).reduce((acc, key) => {
+          acc[key] = validCheckboxes[key].map((option: string) => ({
             label: option,
             value: option,
           }));
@@ -55,10 +55,8 @@ const ResourcesPage: React.FC = () => {
 
         setDropdownOptions(transformedDropdowns);
 
-        
-
         // Initialize dropdown states
-        const initialDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
+        const initialDropdowns = Object.keys(validCheckboxes).reduce((acc, key) => {
           acc[key] = null; // Set default value to null
           return acc;
         }, {} as { [key: string]: { label: string; value: string } | null });
@@ -91,7 +89,7 @@ const ResourcesPage: React.FC = () => {
     // Apply dropdown filters
     for (const [key, value] of Object.entries(dropdowns)) {
       if (value && value.value) {
-        filtered = filtered.filter((item) => item[key] === value.value);
+        filtered = filtered.filter((item) => item[value.value] === 1);
       }
     }
 
@@ -103,8 +101,20 @@ const ResourcesPage: React.FC = () => {
   console.log('Filtered Data:', filteredData);
 
   // Display loading or error states
-  if (isLoading) return <p>Loading data...</p>;
-  if (error) return <p>{error}</p>;
+  if (isLoading) {
+    console.log('Loading state active...');
+    return <p>Loading data...</p>;
+  }
+
+  if (error) {
+    console.log('Error state active...');
+    return <p>{error}</p>;
+  }
+
+  if (!data.length || !Object.keys(dropdownOptions).length) {
+    console.log('No data or dropdown options available.');
+    return <p>No data available to display.</p>;
+  }
 
   return (
     <div className="App">
