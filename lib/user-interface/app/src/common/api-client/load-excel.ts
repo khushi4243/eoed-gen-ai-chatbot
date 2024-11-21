@@ -9,12 +9,16 @@ export class LoadExcelClient {
     }
 
     async loadExcelData(): Promise<any> {
+        const auth = await Utils.authenticate();
         try {
           const response = await fetch(
-            'https://q4wnotmlm0.execute-api.us-east-1.amazonaws.com/get-excel-data',
+            this.API + '/get-excel-data',
             {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              method: 'GET',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+ auth,
+            },
             }
           );
       

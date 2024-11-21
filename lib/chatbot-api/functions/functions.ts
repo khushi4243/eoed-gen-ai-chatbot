@@ -256,6 +256,7 @@ export class LambdaFunctionStack extends cdk.Stack {
           events: [s3.EventType.OBJECT_CREATED],
         }));
     
+  // define lambda function for excel retriever
     const excelRetrieverFunction = new lambda.Function(scope, 'ExcelRetrieverFunction', {
       runtime: lambda.Runtime.PYTHON_3_9, // Adjust runtime as needed
       code: lambda.Code.fromAsset(path.join(__dirname, 'load-excel')), // Path to your Lambda code

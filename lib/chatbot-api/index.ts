@@ -163,6 +163,14 @@ export class ChatBotApi extends Construct {
       authorizer: httpAuthorizer,
     })
 
+    const excelRetrieverFunction = new HttpLambdaIntegration('LoadExcelData', lambdaFunctions.excelRetrieverFunction);
+    restBackend.restAPI.addRoutes({
+      path: "/get-excel-data",
+      methods: [apigwv2.HttpMethod.GET],
+      integration: excelRetrieverFunction,
+      authorizer: httpAuthorizer,
+    })
+
       // this.wsAPI = websocketBackend.wsAPI;
 
 
