@@ -1,19 +1,27 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { LoadExcelClient } from '../../common/api-client/load-excel'; 
-import { AppContext } from "../../common/app-context";
+import { AppContext } from '../../common/app-context';
+import { LoadExcelClient } from '../../common/api-client/load-excel';
+import {
+  Box,
+  Button,
+  ColumnLayout,
+  FormField,
+  Header,
+  Select,
+  Table,
+} from '@cloudscape-design/components';
 import '../../styles/resources.css';
 
+
 const ResourcesPage: React.FC = () => {
-  // Access the AppContext and create an instance of the LoadExcelClient
+  // Access AppContext and create an instance of LoadExcelClient
   const appContext = useContext(AppContext);
   const loadExcelClient = new LoadExcelClient(appContext);
 
-  // States for dropdowns, checkboxes, raw data, and filtered data
+  // State Management
   const [data, setData] = useState<any[]>([]); // Raw data records
-  const [dropdownOptions, setDropdownOptions] = useState<{ [key: string]: string[] }>({});
-  const [checkboxOptions, setCheckboxOptions] = useState<{ [key: string]: string[] }>({});
-  const [dropdowns, setDropdowns] = useState<{ [key: string]: string }>({});
-  const [checkboxes, setCheckboxes] = useState<{ [key: string]: { [option: string]: boolean } }>({});
+  const [dropdownOptions, setDropdownOptions] = useState<{ [key: string]: { label: string; value: string }[] }>({});
+  const [dropdowns, setDropdowns] = useState<{ [key: string]: { label: string; value: string } | null }>({});
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,157 +35,112 @@ const ResourcesPage: React.FC = () => {
       try {
         const jsonData = await loadExcelClient.loadExcelData();
 
-        console.log("Fetched data:", jsonData);
+        console.log('Fetched data:', jsonData);
 
-        // Ensure dropdowns, checkboxes, and records are valid
+        // Extract dropdown options
         const validDropdowns = jsonData.dropdowns || {};
-        const validCheckboxes = jsonData.checkboxes || {};
         const validRecords = jsonData.records || [];
 
         setData(validRecords);
-        setDropdownOptions(validDropdowns);
-        setCheckboxOptions(validCheckboxes);
 
-        // Initialize dropdowns state
-        const initialDropdowns: { [key: string]: string } = {};
-        Object.keys(validDropdowns).forEach((key) => {
-          initialDropdowns[key] = ' '; // Set initial value to empty string
-        });
+        // Transform dropdown options for Cloudscape Select
+        const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
+          acc[key] = validDropdowns[key].map((option: string) => ({
+            label: option,
+            value: option,
+          }));
+          return acc;
+        }, {} as { [key: string]: { label: string; value: string }[] });
+
+        setDropdownOptions(transformedDropdowns);
+
+        // Initialize dropdown states
+        const initialDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
+          acc[key] = null; // Set default value to null
+          return acc;
+        }, {} as { [key: string]: { label: string; value: string } | null });
+
         setDropdowns(initialDropdowns);
-
-        // Initialize checkboxes state
-        const initialCheckboxes: any = {};
-        Object.entries(validCheckboxes).forEach(([key, options]) => {
-          initialCheckboxes[key] = {};
-          (options as string[]).forEach((option: string) => {
-            initialCheckboxes[key][option] = false;
-          });
-        });
-        setCheckboxes(initialCheckboxes);
-
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to load data.");
+        console.error('Error fetching data:', err);
+        setError('Failed to load data.');
       } finally {
-        console.log("chaning load status")
         setIsLoading(false);
       }
     };
 
     fetchData();
   }, [loadExcelClient]);
-  
 
   // Handle dropdown changes
-  const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>, key: string) => {
-    setDropdowns(prev => ({ ...prev, [key]: event.target.value }));
-  };
-
-  // Handle checkbox changes
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, key: string, option: string) => {
-    setCheckboxes(prev => ({
+  const handleDropdownChange = (key: string, selectedOption: { label: string; value: string }) => {
+    setDropdowns((prev) => ({
       ...prev,
-      [key]: {
-        ...prev[key],
-        [option]: event.target.checked,
-      },
+      [key]: selectedOption,
     }));
   };
 
-  // Filter data based on user inputs
+  // Filter data based on dropdown selections
   const filterData = () => {
     let filtered = [...data];
 
     // Apply dropdown filters
     for (const [key, value] of Object.entries(dropdowns)) {
-      if (value) {
-        filtered = filtered.filter(item => item[key] === value);
-      }
-    }
-
-    // Apply checkbox filters
-    for (const [key, options] of Object.entries(checkboxes)) {
-      const selectedOptions = Object.entries(options)
-        .filter(([_, checked]) => checked)
-        .map(([option, _]) => option);
-
-      if (selectedOptions.length > 0) {
-        filtered = filtered.filter(item => selectedOptions.includes(item[key]));
+      if (value && value.value) {
+        filtered = filtered.filter((item) => item[key] === value.value);
       }
     }
 
     setFilteredData(filtered);
   };
 
-  // Display loading and error states
-  // if (isLoading) return <p>Loading data...</p>;
-  // if (error) return <p>{error}</p>;
+  // Display loading or error states
+  if (isLoading) return <p>Loading data...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="App">
-      <h1>Filter Grants and Programs</h1>
+      <Header>Filter Grants and Programs</Header>
 
-      <div className="filter-section">
-        {/* Render Dropdowns */}
-        {Object.entries(dropdownOptions).map(([key, options]) => (
-          <div key={key}>
-            <h2>{key}</h2>
-            <select value={dropdowns[key] || ''} onChange={(e) => handleDropdownChange(e, key)}>
-              <option value="">Select...</option>
-              {options.map((option, idx) => (
-                <option key={idx} value={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-        ))}
+      <Box margin={{ bottom: 'l' }}>
+        <ColumnLayout columns={2} borders="vertical">
+          {/* Render Dropdowns */}
+          {Object.entries(dropdownOptions).map(([key, options]) => (
+            <FormField key={key} label={`Filter by ${key}`}>
+              <Select
+                selectedOption={dropdowns[key]}
+                onChange={({ detail }) => {
+                  const selectedOption = detail.selectedOption;
+                  if (selectedOption && selectedOption.label && selectedOption.value) {
+                    handleDropdownChange(key, { label: selectedOption.label, value: selectedOption.value });
+                  }
+                }}
+                options={options}
+                placeholder="Select an option"
+              />
+            </FormField>
+          ))}
+        </ColumnLayout>
+      </Box>
 
-        {/* Render Checkboxes */}
-        {Object.entries(checkboxOptions).map(([key, options]) => (
-          <div key={key}>
-            <h2>{key}</h2>
-            <div className="checkbox-group">
-              {options.map((option, idx) => (
-                <label key={idx}>
-                  <input
-                    type="checkbox"
-                    checked={checkboxes[key][option] || false}
-                    onChange={(e) => handleCheckboxChange(e, key, option)}
-                  />
-                  {option}
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <Button variant="primary" onClick={filterData}>
+        Filter Results
+      </Button>
 
-      <button onClick={filterData}>Filter Results</button>
-
-      <div className="output-section">
+      <Box margin={{ top: 'l' }}>
         {filteredData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                {/* Adjust columns as necessary */}
-                {Object.keys(data[0]).map((col, idx) => (
-                  <th key={idx}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((row, idx) => (
-                <tr key={idx}>
-                  {Object.values(row).map((value, idx2) => (
-                    <td key={idx2}>{value as React.ReactNode}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            header={<Header>Filtered Results</Header>}
+            columnDefinitions={Object.keys(data[0]).map((key) => ({
+              header: key,
+              cell: (item: any) => item[key],
+            }))}
+            items={filteredData}
+          />
         ) : (
           <p>No matching records found.</p>
         )}
-      </div>
+      </Box>
     </div>
   );
 };
