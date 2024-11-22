@@ -125,9 +125,10 @@ def lambda_handler(event, context):
     evaluation_id = data.get('evaluation_id')
     continuation_token = data.get('continuation_token')
     limit = data.get('limit', 10)
+    test_case_file_name = data.get('test_case_file_name')
 
     if operation == 'get_evaluation_summaries':
-        return get_evaluation_summaries(continuation_token, limit)
+        return get_evaluation_summaries(continuation_token, limit, test_case_file_name)
     elif operation == 'get_evaluation_results':
         if not evaluation_id:
             return {
