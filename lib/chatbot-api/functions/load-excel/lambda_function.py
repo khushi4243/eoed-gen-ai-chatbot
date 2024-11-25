@@ -44,8 +44,10 @@ def lambda_handler(event, context):
         return {
             'statusCode': 200,
             'headers': {
-                'Access-Control-Allow-Origin': '*',  
-                "Access-Control-Allow-Methods": "GET",
+                'Access-Control-Allow-Origin': 'http://localhost:3000',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'OPTIONS,GET',
+                'Content-Type': 'application/json'
             },
             'body': json.dumps(data)
         }
@@ -55,10 +57,12 @@ def lambda_handler(event, context):
         return {
             'statusCode': 500,
             'headers': {
-                'Access-Control-Allow-Origin': '*',  # Adjust as necessary
+                'Access-Control-Allow-Origin': 'http://localhost:3000',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'OPTIONS,GET',
                 'Content-Type': 'application/json'
             },
-            'body': json.dumps(f"Failed to retrieve or process file: {str(e)}")
+            'body': json.dumps({"error": str(e)})
         }
 
 

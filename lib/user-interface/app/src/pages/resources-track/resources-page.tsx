@@ -45,6 +45,7 @@ const ResourcesPage: React.FC = () => {
         console.log('Valid Records:', validRecords);
 
         setData(validRecords);
+        setFilteredData(validRecords);
 
         // Transform dropdown options for Cloudscape Select
         const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
@@ -88,12 +89,14 @@ const ResourcesPage: React.FC = () => {
   const filterData = () => {
     let filtered = [...data];
 
-    // Apply dropdown filters
-    for (const [key, value] of Object.entries(dropdowns)) {
+    Object.entries(dropdowns).forEach(([key, value]) => {
       if (value && value.value) {
-        filtered = filtered.filter((item) => item[key] === value.value);
+        filtered = filtered.filter((item) => 
+          String(item[key]).toLowerCase() === String(value.value).toLowerCase()
+        );
       }
-    }
+    });
+    
     setFilteredData(filtered);
   };
 
@@ -159,11 +162,17 @@ const ResourcesPage: React.FC = () => {
         {filteredData.length > 0 ? (
           <Table
             header={<Header>Filtered Results</Header>}
-            columnDefinitions={Object.keys(data[0]).map((key) => ({
-              header: key,
-              cell: (item: any) => item[key],
-            }))}
+            columnDefinitions={
+              Object.keys(filteredData[0] || {}).map((key) => ({
+                id: key,
+                header: key,
+                cell: (item) => item[key] || '-',
+                sortingField: key
+              }))
+            }
             items={filteredData}
+            wrapLines
+            stripedRows
           />
         ) : (
           <p>No matching records found.</p>
