@@ -41,7 +41,7 @@ const ResourcesPage: React.FC = () => {
         // Extract dropdown options
         const validDropdowns = jsonData.dropdowns || {};
         const validRecords = jsonData.records || [];
-  
+        
         console.log('Valid Dropdowns:', validDropdowns);
         console.log('Valid Records:', validRecords);
   
@@ -72,10 +72,12 @@ const ResourcesPage: React.FC = () => {
         console.log('Setting loading to false...');
         setIsLoading(false);
       }
+
     };
   
     fetchData();
   }, [loadExcelClient]);
+
   
   // Handle dropdown changes
   const handleDropdownChange = (key: string, selectedOption: { label: string; value: string }) => {
