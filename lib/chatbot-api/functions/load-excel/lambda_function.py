@@ -17,16 +17,15 @@ def lambda_handler(event, context):
     kb_id = os.getenv('KB_ID', None)
 
     if not kb_id:
-        raise EnvironmentError("KB_ID environment variable not set")
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({"error": "KB_ID environment variable not set"})
+        }
 
     try:
-        # Retrieve the Excel file
         local_path = retrieve_kb_docs("EOED-Master_1.xlsx", kb_id, bedrock, s3)
-        print(f"File retrieved and saved to {local_path}")
-
-        # Read the Excel file
-        df_master = pd.read_excel(local_path, header=1)  # Adjust header rows if necessary
-        print(df_master.head())  # For debugging
+        df_master = pd.read_excel(local_path, header=1)
 
         headings = {
             "Category": df_master.columns[4:12],  # Columns E-L
@@ -37,31 +36,19 @@ def lambda_handler(event, context):
             "Construct-Existing (Land)": df_master.columns[38:41]  # Columns AL-AO
         }
 
-        # Process the DataFrame into the desired format
         data = process_excel_data(df_master, headings)
-
-        # Return the data as a JSON response
+        
         return {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': 'http://localhost:3000',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'OPTIONS,GET',
-                'Content-Type': 'application/json'
-            },
-            'body': json.dumps(data)
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': data  # Note: process_excel_data already returns JSON string
         }
 
     except Exception as e:
         print(f"Failed to retrieve or process file: {e}")
         return {
             'statusCode': 500,
-            'headers': {
-                'Access-Control-Allow-Origin': 'http://localhost:3000',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'OPTIONS,GET',
-                'Content-Type': 'application/json'
-            },
+            'headers': {'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({"error": str(e)})
         }
 

@@ -2,38 +2,56 @@ import { AppConfig } from "../types";
 import { Utils } from "../utils";
 
 export class LoadExcelClient {
-    private readonly appContext: AppContext;
+    private readonly API;
 
-    constructor(appContext: AppContext) {
-        this.appContext = appContext;
+    constructor(protected _appConfig: AppConfig) {
+        this.API = _appConfig.httpEndpoint.slice(0, -1);
     }
 
     async loadExcelData() {
-        try {
-            const response = await fetch('https://g16qwekzne.execute-api.us-east-1.amazonaws.com/get-excel-data', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+        const auth = await Utils.authenticate();
+        let validData = false;
+        let output;
+        let runs = 0;
+        let limit = 3;
+        let errorMessage = "Could not load excel data";
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        while (!validData && runs < limit) {
+            runs += 1;
+            try {
+                const response = await fetch(this.API + '/get-excel-data', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + auth,
+                    }
+                });
+
+                if (response.status !== 200) {
+                    validData = false;
+                    errorMessage = await response.json();
+                    break;
+                }
+
+                const data = await response.json();
+                
+                // Parse the response body if it's a string
+                output = typeof data.body === 'string' ? JSON.parse(data.body) : data;
+                validData = true;
+
+            } catch (error) {
+                console.error('Attempt', runs, 'failed:', error);
             }
-
-            const data = await response.json();
-            
-            // Parse the response body if it's a string
-            const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
-            
-            return {
-                dropdowns: parsedData.dropdowns || {},
-                records: parsedData.records || [],
-                checkboxes: parsedData.checkboxes || {}
-            };
-        } catch (error) {
-            console.error('Error in loadExcelData:', error);
-            throw error;
         }
+
+        if (!validData) {
+            throw new Error(errorMessage);
+        }
+
+        return {
+            dropdowns: output?.dropdowns || {},
+            records: output?.records || [],
+            checkboxes: output?.checkboxes || {}
+        };
     }
 }
