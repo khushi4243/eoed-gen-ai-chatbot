@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     try:
         local_path = retrieve_kb_docs("EOED-Master_1.xlsx", kb_id, bedrock, s3)
-        df_master = pd.read_excel(local_path, header=1)
+        df_master = pd.read_excel(local_path, header=0)
 
         headings = {
             "Category": df_master.columns[4:12],  # Columns E-L
@@ -122,7 +122,7 @@ def process_excel_data(df, headings):
             checkboxes[main_heading] = list(subheadings.keys())
         else:
             # Handle single-column dropdown options
-            dropdown_values = df[columns].iloc[0].dropna().tolist()
+            dropdown_values = df[columns].iloc[1].dropna().tolist()
             dropdowns[main_heading] = dropdown_values
 
     # Convert the DataFrame to a list of dictionaries for records
