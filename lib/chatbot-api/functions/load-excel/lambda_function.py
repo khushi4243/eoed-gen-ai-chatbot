@@ -25,7 +25,7 @@ def lambda_handler(event, context):
         print(f"File retrieved and saved to {local_path}")
 
         # Read the Excel file
-        df_master = pd.read_excel(local_path, header=1)  # Adjust header rows if necessary
+        df_master = pd.read_excel(local_path, header=0)  # Adjust header rows if necessary
         print(df_master.head())  # For debugging
 
         headings = {

@@ -54,7 +54,6 @@ const ResourcesPage: React.FC = () => {
           }));
           return acc;
         }, {} as { [key: string]: { label: string; value: string }[] });
-
         setDropdownOptions(transformedDropdowns);
 
         // Initialize dropdown states
