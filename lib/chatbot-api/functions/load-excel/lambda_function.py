@@ -25,7 +25,7 @@ def lambda_handler(event, context):
         print(f"File retrieved and saved to {local_path}")
 
         # Read the Excel file
-        df_master = pd.read_excel(local_path, header=0)  # Adjust header rows if necessary
+        df_master = pd.read_excel(local_path, header=1)  # Adjust header rows if necessary
         print(df_master.head())  # For debugging
 
         headings = {
@@ -127,11 +127,11 @@ def process_excel_data(df, headings):
     for main_heading, columns in headings.items():
         if main_heading in ["Category", "Grow Operations", "Construct-New (Land)", "Construct-Existing (Land)"]:
             # Handle multi-column checkbox options
-            subheadings = df[columns].iloc[1].dropna().to_dict()
+            subheadings = df[columns].iloc[0].dropna().to_dict()
             checkboxes[main_heading] = list(subheadings.keys())
         else:
             # Handle single-column dropdown options
-            dropdown_values = df[columns].iloc[1].dropna().tolist()
+            dropdown_values = df[columns].iloc[0].dropna().tolist()
             dropdowns[main_heading] = dropdown_values
 
     # Convert the DataFrame to a list of dictionaries for records

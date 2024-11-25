@@ -95,7 +95,6 @@ const ResourcesPage: React.FC = () => {
         filtered = filtered.filter((item) => item[key] === value.value);
       }
     }
-
     setFilteredData(filtered);
   };
 
