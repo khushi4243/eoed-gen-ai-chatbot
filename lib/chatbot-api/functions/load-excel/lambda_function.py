@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     try:
         local_path = retrieve_kb_docs("EOED-Master_1.xlsx", kb_id, bedrock, s3)
-        df_master = pd.read_excel(local_path, header=0)
+        df_master = pd.read_excel(local_path, header=1)
 
         headings = {
             "Category": df_master.columns[4:12],  # Columns E-L
