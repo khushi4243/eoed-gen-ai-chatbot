@@ -9,11 +9,10 @@ import {
   Header,
   Select,
   Table,
+  Spinner,
+  Alert,
 } from '@cloudscape-design/components';
 import '../../styles/resources.css';
-import S3ResourceSelector from "@cloudscape-design/components/s3-resource-selector";
-
-
 
 const ResourcesPage: React.FC = () => {
   const appContext = useContext(AppContext);
@@ -31,39 +30,39 @@ const ResourcesPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-  
+
       try {
         console.log('Fetching data...');
         const jsonData = await loadExcelClient.loadExcelData();
-  
+
         console.log('Fetched data:', jsonData);
-  
+
         // Extract dropdown options
         const validDropdowns = jsonData.dropdowns || {};
         const validRecords = jsonData.records || [];
-        
+
         console.log('Valid Dropdowns:', validDropdowns);
         console.log('Valid Records:', validRecords);
-  
+
         setData(validRecords);
-  
+
         // Transform dropdown options for Cloudscape Select
         const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
           acc[key] = validDropdowns[key].map((option: string) => ({
-            label: option,
-            value: option,
+            label: option.toString(),
+            value: option.toString(),
           }));
           return acc;
         }, {} as { [key: string]: { label: string; value: string }[] });
-  
+
         setDropdownOptions(transformedDropdowns);
-  
+
         // Initialize dropdown states
         const initialDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
           acc[key] = null; // Set default value to null
           return acc;
         }, {} as { [key: string]: { label: string; value: string } | null });
-  
+
         setDropdowns(initialDropdowns);
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -72,13 +71,11 @@ const ResourcesPage: React.FC = () => {
         console.log('Setting loading to false...');
         setIsLoading(false);
       }
-
     };
-  
+
     fetchData();
   }, [loadExcelClient]);
 
-  
   // Handle dropdown changes
   const handleDropdownChange = (key: string, selectedOption: { label: string; value: string }) => {
     setDropdowns((prev) => ({
@@ -107,12 +104,21 @@ const ResourcesPage: React.FC = () => {
   // Display loading or error states
   if (isLoading) {
     console.log('Loading state active...');
-    return <p>Loading data...</p>;
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <Spinner size="large" />
+        <p>Loading data...</p>
+      </div>
+    );
   }
 
   if (error) {
     console.log('Error state active...');
-    return <p>{error}</p>;
+    return (
+      <Alert type="error" header="Error loading data">
+        {error}
+      </Alert>
+    );
   }
 
   if (!data.length || !Object.keys(dropdownOptions).length) {
@@ -168,4 +174,3 @@ const ResourcesPage: React.FC = () => {
 };
 
 export default ResourcesPage;
-
