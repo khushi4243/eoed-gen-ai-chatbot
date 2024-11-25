@@ -31,39 +31,39 @@ const ResourcesPage: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-
+  
       try {
         console.log('Fetching data...');
         const jsonData = await loadExcelClient.loadExcelData();
-
+  
         console.log('Fetched data:', jsonData);
-
-        // Extract dropdown options from checkboxes
-        const validCheckboxes = jsonData.checkboxes || {};
+  
+        // Extract dropdown options
+        const validDropdowns = jsonData.dropdowns || {};
         const validRecords = jsonData.records || [];
-
-        console.log('Valid Checkboxes:', validCheckboxes);
+  
+        console.log('Valid Dropdowns:', validDropdowns);
         console.log('Valid Records:', validRecords);
-
+  
         setData(validRecords);
-
-        // Transform checkbox options for Cloudscape Select
-        const transformedDropdowns = Object.keys(validCheckboxes).reduce((acc, key) => {
-          acc[key] = validCheckboxes[key].map((option: string) => ({
+  
+        // Transform dropdown options for Cloudscape Select
+        const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
+          acc[key] = validDropdowns[key].map((option: string) => ({
             label: option,
             value: option,
           }));
           return acc;
         }, {} as { [key: string]: { label: string; value: string }[] });
-
+  
         setDropdownOptions(transformedDropdowns);
-
+  
         // Initialize dropdown states
-        const initialDropdowns = Object.keys(validCheckboxes).reduce((acc, key) => {
+        const initialDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
           acc[key] = null; // Set default value to null
           return acc;
         }, {} as { [key: string]: { label: string; value: string } | null });
-
+  
         setDropdowns(initialDropdowns);
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -73,10 +73,10 @@ const ResourcesPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, [loadExcelClient]);
-
+  
   // Handle dropdown changes
   const handleDropdownChange = (key: string, selectedOption: { label: string; value: string }) => {
     setDropdowns((prev) => ({
@@ -92,7 +92,7 @@ const ResourcesPage: React.FC = () => {
     // Apply dropdown filters
     for (const [key, value] of Object.entries(dropdowns)) {
       if (value && value.value) {
-        filtered = filtered.filter((item) => item[value.value] === 1);
+        filtered = filtered.filter((item) => item[key] === value.value);
       }
     }
 

@@ -25,11 +25,20 @@ def lambda_handler(event, context):
         print(f"File retrieved and saved to {local_path}")
 
         # Read the Excel file
-        df = pd.read_excel(local_path, header=[0, 1])  # Adjust header rows if necessary
-        print(df.head())  # For debugging
+        df_master = pd.read_excel(local_path, header=0)  # Adjust header rows if necessary
+        print(df_master.head())  # For debugging
+
+        headings = {
+            "Category": df_master.columns[4:12],  # Columns E-L
+            "Life Cycle": df_master.columns[12:16],  # Columns M-P
+            "Size": df_master.columns[16:23],  # Columns Q-W
+            "Grow Operations": df_master.columns[25:32],  # Columns Y-AF
+            "Construct-New (Land)": df_master.columns[34:37],  # Columns AH-AK
+            "Construct-Existing (Land)": df_master.columns[38:41]  # Columns AL-AO
+        }
 
         # Process the DataFrame into the desired format
-        data = process_excel_data(df)
+        data = process_excel_data(df_master, headings)
 
         # Return the data as a JSON response
         return {
@@ -96,51 +105,39 @@ def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
         print(f"Error retrieving document: {e}")
         raise
 
+def process_excel_data(df, headings):
+    """
+    Process the Excel data to extract dropdown and checkbox options dynamically.
 
-def process_excel_data(df):
+    Args:
+        df (DataFrame): The loaded Excel data.
+        headings (dict): A dictionary mapping main categories to their column ranges.
 
+    Returns:
+        str: JSON string containing dropdowns, checkboxes, and records.
+    """
+    # Replace NaN values with None
     df = df.replace({np.nan: None})
-    # This function processes the DataFrame and returns data in the desired format
-
-    # Initialize dictionaries to hold dropdown and checkbox options
+    
+    # Initialize dictionaries for dropdowns and checkboxes
     dropdowns = {}
     checkboxes = {}
 
-    # Assuming the first two rows are headers (adjust as necessary)
-    # Flatten multi-level columns if needed
-    df.columns = [' '.join(col).strip() for col in df.columns.values]
+    # Extract options for dropdowns and checkboxes dynamically
+    for main_heading, columns in headings.items():
+        if main_heading in ["Category", "Grow Operations", "Construct-New (Land)", "Construct-Existing (Land)"]:
+            # Handle multi-column checkbox options
+            subheadings = df[columns].iloc[0].dropna().to_dict()
+            checkboxes[main_heading] = list(subheadings.keys())
+        else:
+            # Handle single-column dropdown options
+            dropdown_values = df[columns].iloc[0].dropna().tolist()
+            dropdowns[main_heading] = dropdown_values
 
-    # Extract unique values for dropdowns and checkboxes
-    # Adjust column names to match your Excel file
-
-    # For example, extract options for 'Life Cycle' dropdown
-    if 'Life Cycle' in df.columns:
-        dropdowns['Life Cycle'] = df['Life Cycle'].dropna().unique().tolist()
-
-    # Extract options for 'Size' dropdown
-    if 'Size' in df.columns:
-        dropdowns['Size'] = df['Size'].dropna().unique().tolist()
-
-    # Extract options for 'Category' checkboxes
-    if 'Category' in df.columns:
-        checkboxes['Category'] = df['Category'].dropna().unique().tolist()
-
-    # Similarly extract for other categories
-    # For checkboxes that may have multiple columns (e.g., 'Grow Operations'), you may need to handle binary columns
-    # For the sake of example, let's handle binary columns indicating the presence (1) or absence (0) of a category
-
-    # Identify binary columns (assuming they are binary indicators)
-    binary_columns = [col for col in df.columns if df[col].dropna().isin([0,1]).all()]
-
-    # For each binary column, add the column name to the checkbox options
-    for col in binary_columns:
-        # You can categorize them if necessary
-        checkboxes.setdefault('Binary Categories', []).append(col)
-
-    # Convert DataFrame to a list of dictionaries for records
+    # Convert the DataFrame to a list of dictionaries for records
     records = df.to_dict(orient='records')
 
-    # Prepare the data to return
+    # Prepare the data dictionary to return
     data = {
         'dropdowns': dropdowns,
         'checkboxes': checkboxes,
