@@ -25,15 +25,7 @@ def lambda_handler(event, context):
 
     try:
         local_path = retrieve_kb_docs("EOED-Master_1.xlsx", kb_id, bedrock, s3)
-<<<<<<< HEAD
-        print(f"File retrieved and saved to {local_path}")
-
-        # Read the Excel file
-        df_master = pd.read_excel(local_path, header=0)  # Adjust header rows if necessary
-        print(df_master.head())  # For debugging
-=======
-        df_master = pd.read_excel(local_path, header=1)
->>>>>>> 45db9ce3b4ce3a0157f170132753423bb6b54877
+        df_master = pd.read_excel(local_path, header=0)
 
         headings = {
             "Category": df_master.columns[4:12],  # Columns E-L
