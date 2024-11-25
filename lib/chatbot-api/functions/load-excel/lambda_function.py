@@ -114,16 +114,24 @@ def process_excel_data(df, headings):
     dropdowns = {}
     checkboxes = {}
 
+    # Add logging
+    print("=== Processing Excel Data ===")
+    print(f"DataFrame headers: {df.columns.tolist()}")
+
     # Extract options for dropdowns and checkboxes dynamically
     for main_heading, columns in headings.items():
-        if main_heading in ["Category", "Grow Operations", "Construct-New (Land)", "Construct-Existing (Land)"]:
-            # Handle multi-column checkbox options
+        if main_heading in ["Size", "Life Cycle"]:
+            dropdown_values = columns.tolist()
+            dropdowns[main_heading] = dropdown_values
+            print(f"\n{main_heading} dropdown values:")
+            print(f"Columns used: {columns}")
+            print(f"Values extracted: {dropdown_values}")
+        else:
             subheadings = df[columns].iloc[0].dropna().to_dict()
             checkboxes[main_heading] = list(subheadings.keys())
-        else:
-            # Handle single-column dropdown options
-            dropdown_values = df[columns].iloc[1].dropna().tolist()
-            dropdowns[main_heading] = dropdown_values
+
+    print("\nFinal dropdowns dictionary:")
+    print(json.dumps(dropdowns, indent=2))
 
     # Convert the DataFrame to a list of dictionaries for records
     records = df.to_dict(orient='records')
