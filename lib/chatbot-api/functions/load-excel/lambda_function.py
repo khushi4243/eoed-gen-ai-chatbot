@@ -17,16 +17,23 @@ def lambda_handler(event, context):
     kb_id = os.getenv('KB_ID', None)
 
     if not kb_id:
-        raise EnvironmentError("KB_ID environment variable not set")
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({"error": "KB_ID environment variable not set"})
+        }
 
     try:
-        # Retrieve the Excel file
         local_path = retrieve_kb_docs("EOED-Master_1.xlsx", kb_id, bedrock, s3)
+<<<<<<< HEAD
         print(f"File retrieved and saved to {local_path}")
 
         # Read the Excel file
         df_master = pd.read_excel(local_path, header=0)  # Adjust header rows if necessary
         print(df_master.head())  # For debugging
+=======
+        df_master = pd.read_excel(local_path, header=1)
+>>>>>>> 45db9ce3b4ce3a0157f170132753423bb6b54877
 
         headings = {
             "Category": df_master.columns[4:12],  # Columns E-L
@@ -37,28 +44,20 @@ def lambda_handler(event, context):
             "Construct-Existing (Land)": df_master.columns[38:41]  # Columns AL-AO
         }
 
-        # Process the DataFrame into the desired format
         data = process_excel_data(df_master, headings)
-
-        # Return the data as a JSON response
+        
         return {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',  
-                "Access-Control-Allow-Methods": "GET",
-            },
-            'body': json.dumps(data)
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': data  # Note: process_excel_data already returns JSON string
         }
 
     except Exception as e:
         print(f"Failed to retrieve or process file: {e}")
         return {
             'statusCode': 500,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',  # Adjust as necessary
-                'Content-Type': 'application/json'
-            },
-            'body': json.dumps(f"Failed to retrieve or process file: {str(e)}")
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({"error": str(e)})
         }
 
 
