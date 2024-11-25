@@ -11,6 +11,9 @@ import {
   Table,
 } from '@cloudscape-design/components';
 import '../../styles/resources.css';
+import S3ResourceSelector from "@cloudscape-design/components/s3-resource-selector";
+
+
 
 const ResourcesPage: React.FC = () => {
   const appContext = useContext(AppContext);
@@ -164,3 +167,4 @@ const ResourcesPage: React.FC = () => {
 };
 
 export default ResourcesPage;
+

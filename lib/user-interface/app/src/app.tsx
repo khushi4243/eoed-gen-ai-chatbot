@@ -12,7 +12,7 @@ import GlobalHeader from "./components/global-header";
 import Playground from "./pages/chatbot/playground/playground";
 import DataPage from "./pages/admin/data-view-page";
 import UserFeedbackPage from "./pages/admin/user-feedback-page";
-import SessionPage from "./pages/chatbot/sessions/sessions"
+import SessionPage from "./pages/chatbot/sessions/sessions";
 import LandingPage from './pages/landing-page/base-page';
 import ResourcesPage from './pages/resources-track/resources-page';
 import "./styles/app.scss";
