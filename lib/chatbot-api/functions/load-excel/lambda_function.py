@@ -127,7 +127,7 @@ def process_excel_data(df, headings):
             print(f"Columns used: {columns}")
             print(f"Values extracted: {dropdown_values}")
         else:
-            subheadings = df[columns].iloc[0].dropna().to_dict()
+            subheadings = df[columns].iloc[1].dropna().to_dict()
             checkboxes[main_heading] = list(subheadings.keys())
 
     print("\nFinal dropdowns dictionary:")
