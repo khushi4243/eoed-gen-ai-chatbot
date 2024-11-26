@@ -94,52 +94,35 @@ const ResourcesPage: React.FC = () => {
   // Filter data based on dropdown and checkbox selections
   const filterData = () => {
     let filtered = [...data];
-    console.log('Initial data structure:', {
-      sampleRecord: filtered[0],
-      totalRecords: filtered.length
-    });
+    console.log('Starting filter with records:', filtered.length);
 
     // Apply dropdown filters (AND logic)
-    Object.entries(dropdowns).forEach(([category, value]) => {
-      if (value?.value) {
-        console.log(`Filtering by ${category}:`, {
-          lookingFor: value.value,
-          sampleRecordValue: filtered[0]?.[value.value],
-          valueType: typeof filtered[0]?.[value.value]
+    // Records must match ALL selected dropdown values
+    const activeDropdowns = Object.entries(dropdowns).filter(([_, value]) => value !== null);
+    if (activeDropdowns.length > 0) {
+      filtered = filtered.filter(item => {
+        return activeDropdowns.every(([_, value]) => {
+          if (!value?.value) return true;
+          return item[value.value] === 1;
         });
-        filtered = filtered.filter((item) => {
-          const matches = item[value.value] === 1;
-          console.log(`Item ${item['Resource Name']} has value ${item[value.value]} for ${value.value}`);
-          return matches;
-        });
-        console.log(`Records after ${category} filter:`, filtered.length);
-      }
-    });
+      });
+    }
 
-    // Apply checkbox filters (OR logic within each group)
-    Object.entries(checkboxSelections).forEach(([group, selections]) => {
-      if (selections.size > 0) {
-        console.log(`Filtering by ${group}:`, {
-          selections: Array.from(selections),
-          sampleRecordValues: Object.fromEntries(
-            Array.from(selections).map(selection => [selection, filtered[0]?.[selection]])
-          )
-        });
-        filtered = filtered.filter((item) =>
-          Array.from(selections).some((selection) => {
-            const matches = item[selection] === 1;
-            console.log(`Item ${item['Resource Name']} has value ${item[selection]} for ${selection}`);
-            return matches;
-          })
-        );
-        console.log(`Records after ${group} filter:`, filtered.length);
-      }
-    });
+    // Apply checkbox filters (OR logic across all checkbox categories)
+    // Records are included if they match ANY selected checkbox
+    const activeCheckboxes = Object.entries(checkboxSelections)
+      .filter(([_, selections]) => selections.size > 0)
+      .map(([group, selections]) => Array.from(selections))
+      .flat();
 
-    console.log('Final filtered data:', {
-      count: filtered.length,
-      sample: filtered[0]
-    });
+    if (activeCheckboxes.length > 0) {
+      filtered = filtered.filter(item => {
+        // Check if the item matches ANY of the selected checkboxes
+        return activeCheckboxes.some(selection => item[selection] === 1);
+      });
+    }
+
+    console.log('Final filtered count:', filtered.length);
     setFilteredData(filtered);
   };
 
