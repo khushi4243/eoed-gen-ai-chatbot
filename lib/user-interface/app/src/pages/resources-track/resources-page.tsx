@@ -228,9 +228,7 @@ const ResourcesPage: React.FC = () => {
             <p>No matching records found.</p>
           )}
         </Box>
-      </Box>
     </div>
   );
 };
-
 export default ResourcesPage;
