@@ -46,15 +46,15 @@ const ResourcesPage: React.FC = () => {
         // Transform dropdown options for Cloudscape Select
         const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
           acc[key] = validDropdowns[key].map((option: string) => ({
-            label: option,
-            value: option,
+            label: option.toString(),
+            value: option.toString(),
           }));
           return acc;
         }, {});
         setDropdownOptions(transformedDropdowns);
 
         // Store the checkbox options
-        setCheckboxOptions(jsonData.checkboxes || {});
+        setCheckboxOptions(validCheckboxes);
 
         // Initialize checkbox states
         const initialCheckboxSelections = Object.keys(validCheckboxes).reduce((acc, key) => {
@@ -96,9 +96,11 @@ const ResourcesPage: React.FC = () => {
     let filtered = [...data];
 
     // Apply dropdown filters (AND logic)
-    Object.entries(dropdowns).forEach(([category, value]) => {
+    Object.entries(dropdowns).forEach(([key, value]) => {
       if (value?.value) {
-        filtered = filtered.filter((item) => item[value.value] === 1);
+        filtered = filtered.filter((item) =>
+          String(item[key]).toLowerCase() === String(value.value).toLowerCase()
+        );
       }
     });
 
@@ -106,7 +108,7 @@ const ResourcesPage: React.FC = () => {
     Object.entries(checkboxSelections).forEach(([group, selections]) => {
       if (selections.size > 0) {
         filtered = filtered.filter((item) =>
-          Array.from(selections).some((selection) => item[selection] === 1)
+          Array.from(selections).some((selection) => item[group]?.includes(selection))
         );
       }
     });
@@ -137,92 +139,103 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div className="App">
-      <Header>Filter Grants and Programs</Header>
+      <Box padding={{ horizontal: 'xxxl' }} margin={{ horizontal: 'auto' }} maxWidth={1200}>
+        <Box textAlign="center" margin={{ bottom: 'xl' }}>
+          <Header
+            variant="h1"
+            description="Use the filters below to find relevant programs"
+            headingTagOverride="h1"
+            style={{ width: '100%', textAlign: 'center' }}
+          >
+            Filter Grants and Programs
+          </Header>
+        </Box>
 
-      {/* Dropdown Filters */}
-      <Box margin={{ bottom: 'l' }}>
-        <ColumnLayout columns={2} borders="vertical">
-          {Object.entries(dropdownOptions).map(([key, options]) => (
-            <FormField key={key} label={`Filter by ${key}`}>
-              <Select
-                selectedOption={dropdowns[key]}
-                onChange={({ detail }) => {
-                  const selectedOption = detail.selectedOption;
-                  if (selectedOption) {
-                    handleDropdownChange(key, { label: selectedOption.label, value: selectedOption.value });
-                  }
-                }}
-                options={options}
-                placeholder={`Select ${key}`}
-              />
-            </FormField>
-          ))}
-        </ColumnLayout>
-      </Box>
-
-    {/* Checkbox Filters */}
-    <Box margin={{ bottom: 'l' }}>
-      {Object.entries(checkboxOptions).map(([group, options]) => (
-        <Box key={group} margin={{ bottom: 'm' }}>
-          <Header>{`Filter by ${group}`}</Header>
-          {options.length > 0 ? (
-            options.map((option) => (
-              <Checkbox
-                key={`${group}-${option}`}
-                checked={checkboxSelections[group]?.has(option) || false}
-                onChange={({ detail }) => {
-                  setCheckboxSelections((prev) => {
-                    const updated = new Set(prev[group]);
-                    if (detail.checked) {
-                      updated.add(option);
-                    } else {
-                      updated.delete(option);
+        {/* Dropdown Filters */}
+        <Box margin={{ bottom: 'l' }}>
+          <ColumnLayout columns={2} borders="vertical">
+            {Object.entries(dropdownOptions).map(([key, options]) => (
+              <FormField key={key} label={`Filter by ${key}`}>
+                <Select
+                  selectedOption={dropdowns[key]}
+                  onChange={({ detail }) => {
+                    const selectedOption = detail.selectedOption;
+                    if (selectedOption) {
+                      handleDropdownChange(key, { label: selectedOption.label, value: selectedOption.value });
                     }
-                    return { ...prev, [group]: updated };
-                  });
-                }}
-              >
-                {option}
-              </Checkbox>
-            ))
+                  }}
+                  options={options}
+                  placeholder={`Select ${key}`}
+                />
+              </FormField>
+            ))}
+          </ColumnLayout>
+        </Box>
+
+        {/* Checkbox Filters */}
+        <Box margin={{ bottom: 'l' }}>
+          {Object.entries(checkboxOptions).map(([group, options]) => (
+            <Box key={group} margin={{ bottom: 'm' }}>
+              <Header>{`Filter by ${group}`}</Header>
+              {options.length > 0 ? (
+                options.map((option) => (
+                  <Checkbox
+                    key={`${group}-${option}`}
+                    checked={checkboxSelections[group]?.has(option) || false}
+                    onChange={({ detail }) => {
+                      setCheckboxSelections((prev) => {
+                        const updated = new Set(prev[group]);
+                        if (detail.checked) {
+                          updated.add(option);
+                        } else {
+                          updated.delete(option);
+                        }
+                        return { ...prev, [group]: updated };
+                      });
+                    }}
+                  >
+                    {option}
+                  </Checkbox>
+                ))
+              ) : (
+                <p>No options available for {group}</p>
+              )}
+            </Box>
+          ))}
+        </Box>
+
+        {/* Filter Results Button */}
+        <Box textAlign="center" margin={{ bottom: 'l' }}>
+          <Button variant="primary" onClick={filterData}>
+            Filter Results
+          </Button>
+        </Box>
+
+        {/* Filtered Data Table */}
+        <Box margin={{ top: 'l' }}>
+          {filteredData.length > 0 ? (
+            <Table
+              header={<Header>Filtered Results</Header>}
+              columnDefinitions={[
+                {
+                  id: 'Agency',
+                  header: 'Agency',
+                  cell: (item) => item['Agency'] || '-',
+                },
+                {
+                  id: 'Resource Name',
+                  header: 'Resource Name',
+                  cell: (item) => item['Resource Name'] || '-',
+                },
+              ]}
+              items={filteredData}
+              wrapLines
+              stripedRows
+            />
           ) : (
-            <p>No options available for {group}</p>
+            <p>No matching records found.</p>
           )}
         </Box>
-      ))}
-    </Box>
-
-
-
-      {/* Filter Results Button */}
-      <Button variant="primary" onClick={filterData}>
-        Filter Results
-      </Button>
-
-      {/* Filtered Data Table */}
-      <Box margin={{ top: 'l' }}>
-        {filteredData.length > 0 ? (
-          <Table
-            header={<Header>Filtered Results</Header>}
-            columnDefinitions={[
-              {
-                id: 'Agency',
-                header: 'Agency',
-                cell: (item) => item['Agency'] || '-',
-              },
-              {
-                id: 'Resource Name',
-                header: 'Resource Name',
-                cell: (item) => item['Resource Name'] || '-',
-              },
-            ]}
-            items={filteredData}
-            wrapLines
-            stripedRows
-          />
-        ) : (
-          <p>No matching records found.</p>
-        )}
       </Box>
     </div>
   );
