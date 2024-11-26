@@ -100,29 +100,36 @@ def process_excel_data(df, headings):
     """
     Process the Excel data to extract dropdown and checkbox options dynamically.
     """
+    print("\n=== Starting Data Processing ===")
+    print("DataFrame columns:", df.columns.tolist())
+    print("\nHeadings configuration:")
+    for category, cols in headings.items():
+        print(f"{category}: {cols.tolist()}")
+    
     # Replace NaN values with 0
     df = df.replace({np.nan: 0})
     
     # Initialize dictionaries for dropdowns and checkboxes
     dropdowns = {}
     checkboxes = {}
-
-    print("=== Processing Excel Data ===")
     
     # Process each heading category
     for main_heading, columns in headings.items():
+        print(f"\nProcessing {main_heading}:")
         if main_heading in ["Size", "Life Cycle"]:
             # For dropdown categories, get the column names as options
             dropdown_values = [col for col in columns if pd.notna(col)]
             dropdowns[main_heading] = dropdown_values
+            print(f"Added dropdown values: {dropdown_values}")
         else:
             # For checkbox categories, get the column names as options
             checkbox_values = [col for col in columns if pd.notna(col)]
             checkboxes[main_heading] = checkbox_values
+            print(f"Added checkbox values: {checkbox_values}")
 
     # Process records to include all necessary fields
     processed_records = []
-    for _, row in df.iterrows():
+    for idx, row in df.iterrows():
         if pd.isna(row['Agency']) and pd.isna(row['Resource Name']):
             continue
             
@@ -140,17 +147,23 @@ def process_excel_data(df, headings):
                     if isinstance(value, (bool, float)):
                         value = 1 if value == 1.0 or value is True else 0
                     record[col] = value
-
+                    
+        # Debug log for first few records
+        if idx < 2:
+            print(f"\nSample Record {idx + 1}:")
+            print(json.dumps(record, indent=2))
+            
         processed_records.append(record)
+
+    print("\n=== Final Data Structure ===")
+    print("Dropdowns:", json.dumps(dropdowns, indent=2))
+    print("Checkboxes:", json.dumps(checkboxes, indent=2))
+    print(f"Total Records: {len(processed_records)}")
 
     data = {
         'dropdowns': dropdowns,
         'checkboxes': checkboxes,
         'records': processed_records
     }
-
-    print("\nSample record structure:")
-    if processed_records:
-        print(json.dumps(processed_records[0], indent=2))
 
     return json.dumps(data)
