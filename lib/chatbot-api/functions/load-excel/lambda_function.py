@@ -127,6 +127,16 @@ def process_excel_data(df, headings):
             checkboxes[main_heading] = checkbox_values
             print(f"Added checkbox values: {checkbox_values}")
 
+    # Add sample data logging
+    print("\n=== Sample Data Values ===")
+    if len(df) > 0:
+        sample_row = df.iloc[0]
+        print("\nFirst row values:")
+        for heading, columns in headings.items():
+            print(f"\n{heading}:")
+            for col in columns:
+                print(f"{col}: {sample_row[col]} (type: {type(sample_row[col])})")
+
     # Process records to include all necessary fields
     processed_records = []
     for idx, row in df.iterrows():
@@ -145,14 +155,18 @@ def process_excel_data(df, headings):
                     # Convert boolean or float 1.0/0.0 to integer 1/0
                     value = row[col]
                     if isinstance(value, (bool, float)):
-                        value = 1 if value == 1.0 or value is True else 0
+                        value = int(value == 1.0 or value is True)
                     record[col] = value
                     
-        # Debug log for first few records
-        if idx < 2:
-            print(f"\nSample Record {idx + 1}:")
-            print(json.dumps(record, indent=2))
-            
+        if idx < 2:  # Log first two records in detail
+            print(f"\nDetailed Record {idx + 1}:")
+            print("Resource Name:", record['Resource Name'])
+            for heading, columns in headings.items():
+                print(f"\n{heading} values:")
+                for col in columns:
+                    if col in record:
+                        print(f"{col}: {record[col]} (type: {type(record[col])})")
+
         processed_records.append(record)
 
     print("\n=== Final Data Structure ===")
