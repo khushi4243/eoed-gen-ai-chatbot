@@ -28,12 +28,12 @@ def lambda_handler(event, context):
         df_master = pd.read_excel(local_path, header=1)
 
         headings = {
-            "Category": df_master.columns[5:13],  # Columns E-L
+            "Category": df_master.columns[4:13],  # Columns E-M
             "Life Cycle": df_master.columns[13:17],  # Columns M-P
-            "Size": df_master.columns[18:24],  # Columns Q-W
-            "Grow Operations": df_master.columns[26:33],  # Columns Y-AF
-            "Construct-New (Land)": df_master.columns[35:38],  # Columns AH-AK
-            "Construct-Existing (Land)": df_master.columns[39:42]  # Columns AL-AO
+            "Size": df_master.columns[17:24],  # Columns Q-W
+            "Grow Operations": df_master.columns[25:33],  # Columns Y-AF
+            "Construct-New (Land)": df_master.columns[34:38],  # Columns AH-AK
+            "Construct-Existing (Land)": df_master.columns[38:42]  # Columns AL-AO
         }
 
         data = process_excel_data(df_master, headings)
