@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         headings = {
             "Category": df_master.columns[5:13],  # Columns E-L
             "Life Cycle": df_master.columns[14:17],  # Columns M-P
-            "Size": df_master.columns[17:24],  # Columns Q-W
+            "Size": df_master.columns[18:24],  # Columns Q-W
             "Grow Operations": df_master.columns[26:33],  # Columns Y-AF
             "Construct-New (Land)": df_master.columns[35:38],  # Columns AH-AK
             "Construct-Existing (Land)": df_master.columns[39:42]  # Columns AL-AO
