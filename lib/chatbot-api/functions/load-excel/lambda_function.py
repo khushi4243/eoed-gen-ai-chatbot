@@ -99,48 +99,58 @@ def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
 def process_excel_data(df, headings):
     """
     Process the Excel data to extract dropdown and checkbox options dynamically.
-
-    Args:
-        df (DataFrame): The loaded Excel data.
-        headings (dict): A dictionary mapping main categories to their column ranges.
-
-    Returns:
-        str: JSON string containing dropdowns, checkboxes, and records.
     """
-    # Replace NaN values with None
-    df = df.replace({np.nan: None})
+    # Replace NaN values with 0
+    df = df.replace({np.nan: 0})
     
     # Initialize dictionaries for dropdowns and checkboxes
     dropdowns = {}
     checkboxes = {}
 
-    # Add logging
     print("=== Processing Excel Data ===")
-    print(f"DataFrame headers: {df.columns.tolist()}")
-
-    # Extract options for dropdowns and checkboxes dynamically
+    
+    # Process each heading category
     for main_heading, columns in headings.items():
         if main_heading in ["Size", "Life Cycle"]:
-            dropdown_values = columns.tolist()
+            # For dropdown categories, get the column names as options
+            dropdown_values = [col for col in columns if pd.notna(col)]
             dropdowns[main_heading] = dropdown_values
-            print(f"\n{main_heading} dropdown values:")
-            print(f"Columns used: {columns}")
-            print(f"Values extracted: {dropdown_values}")
         else:
-            subheadings = df[columns].iloc[1].dropna().to_dict()
-            checkboxes[main_heading] = list(subheadings.keys())
+            # For checkbox categories, get the column names as options
+            checkbox_values = [col for col in columns if pd.notna(col)]
+            checkboxes[main_heading] = checkbox_values
 
-    print("\nFinal dropdowns dictionary:")
-    print(json.dumps(dropdowns, indent=2))
+    # Process records to include all necessary fields
+    processed_records = []
+    for _, row in df.iterrows():
+        if pd.isna(row['Agency']) and pd.isna(row['Resource Name']):
+            continue
+            
+        record = {
+            'Agency': row['Agency'],
+            'Resource Name': row['Resource Name']
+        }
+        
+        # Add values for each dropdown/checkbox field
+        for heading, columns in headings.items():
+            for col in columns:
+                if pd.notna(col):  # Only process valid column names
+                    # Convert boolean or float 1.0/0.0 to integer 1/0
+                    value = row[col]
+                    if isinstance(value, (bool, float)):
+                        value = 1 if value == 1.0 or value is True else 0
+                    record[col] = value
 
-    # Convert the DataFrame to a list of dictionaries for records
-    records = df.to_dict(orient='records')
+        processed_records.append(record)
 
-    # Prepare the data dictionary to return
     data = {
         'dropdowns': dropdowns,
         'checkboxes': checkboxes,
-        'records': records
+        'records': processed_records
     }
+
+    print("\nSample record structure:")
+    if processed_records:
+        print(json.dumps(processed_records[0], indent=2))
 
     return json.dumps(data)

@@ -96,18 +96,17 @@ const ResourcesPage: React.FC = () => {
     let filtered = [...data];
 
     // Apply dropdown filters (AND logic)
-    Object.entries(dropdowns).forEach(([key, value]) => {
+    Object.entries(dropdowns).forEach(([category, value]) => {
       if (value?.value) {
-        filtered = filtered.filter((item) => String(item[key]).toLowerCase() === String(value.value).toLowerCase());
+        filtered = filtered.filter((item) => item[value.value] === 1);
       }
     });
 
     // Apply checkbox filters (OR logic within each group)
     Object.entries(checkboxSelections).forEach(([group, selections]) => {
       if (selections.size > 0) {
-        const selectedArray = Array.from(selections);
         filtered = filtered.filter((item) =>
-          selectedArray.some((selection) => String(item[group]).toLowerCase() === selection.toLowerCase())
+          Array.from(selections).some((selection) => item[selection] === 1)
         );
       }
     });
