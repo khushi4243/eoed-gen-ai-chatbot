@@ -139,17 +139,9 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div className="App">
-      <Box padding={{ horizontal: 'xxxl' }} margin={{ horizontal: 'auto' }} maxWidth={1200}>
-        <Box textAlign="center" margin={{ bottom: 'xl' }}>
-          <Header
-            variant="h1"
-            description="Use the filters below to find relevant programs"
-            headingTagOverride="h1"
-            style={{ width: '100%', textAlign: 'center' }}
-          >
+          <Header>
             Filter Grants and Programs
           </Header>
-        </Box>
 
         {/* Dropdown Filters */}
         <Box margin={{ bottom: 'l' }}>
