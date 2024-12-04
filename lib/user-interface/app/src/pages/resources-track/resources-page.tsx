@@ -99,17 +99,24 @@ const ResourcesPage: React.FC = () => {
   };
 
   const handleNavigateToAI = () => {
-    // Create a list of resources
     const newSessionId = uuidv4();
     const resourcesList = filteredData.map(item => 
       `${item['Resource Name']}`
     ).join(', ');
 
-    const prompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
-    Could you please summarize these resources and their key benefits?`;
+    // Create two prompts: one for display and one for processing
+    const displayPrompt = "Finding more information about the selected grants and programs...";
+    const actualPrompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
+    Could you please summarize these resources and their key benefits,
+    and highlight any important eligibility requirements or deadlines for each resource?`;
 
-    // Navigate to the chatbot page with the prompt
-    navigate(`/chatbot/playground/${newSessionId}`, { state: { prompt } });
+    // Navigate with both prompts
+    navigate(`/chatbot/playground/${newSessionId}`, { 
+      state: { 
+        displayPrompt,
+        actualPrompt 
+      } 
+    });
   };
 
   // Filter data based on dropdown and checkbox selections
