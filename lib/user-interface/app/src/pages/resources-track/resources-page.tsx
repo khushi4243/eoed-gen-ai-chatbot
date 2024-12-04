@@ -87,7 +87,7 @@ const ResourcesPage: React.FC = () => {
   }, [loadExcelClient]);
 
   // Handle dropdown changes
-  const handleDropdownChange = (key: string, selectedOption: { label: string; value: string }) => {
+  const handleDropdownChange = (key: string, selectedOption: { label: string; value: string } | null) => {
     setDropdowns((prev) => ({
       ...prev,
       [key]: selectedOption,
@@ -163,79 +163,174 @@ const ResourcesPage: React.FC = () => {
   }
 
   return (
-    <div className="App">
-          <Header>
-            Filter Grants and Programs
+    <div>
+      {/* Main Header */}
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '40px 0', 
+        backgroundColor: '#001f3f', 
+        color: 'white',
+        marginBottom: '40px'  // Increased margin
+      }}>
+        <div style={{ 
+          fontSize: '48px', 
+          fontWeight: 'bold', 
+          color: '#d1e3f0', 
+          textAlign: 'center' 
+        }}>
+          Filter Grants and Programs
+        </div>
+        <p style={{ 
+          fontSize: '20px', 
+          color: '#d1e3f0', 
+          margin: '10px 0' 
+        }}>
+          Use the filters below to find relevant programs
+        </p>
+      </div>
+
+      {/* Main Content */}
+      <Box padding={{ horizontal: 'xxxl' }}>
+        {/* Primary Filters Section */}
+        <div style={{
+          backgroundColor: '#e8f0fa',
+          padding: '30px',
+          borderRadius: '15px',
+          marginBottom: '40px'
+        }}>
+          <Header
+            variant="h1"
+            description="Start by selecting these primary filters"
+          >
+            Step 1: Primary Filters
           </Header>
-
-        {/* Dropdown Filters */}
-        <Box margin={{ bottom: 'l' }}>
+          {/* Primary Dropdowns (Life Cycle and Size) */}
           <ColumnLayout columns={2} borders="vertical">
-            {Object.entries(dropdownOptions).map(([key, options]) => (
-              <FormField key={key} label={`Filter by ${key}`}>
-                <Select
-                  selectedOption={dropdowns[key] || { label: "No selection", value: "" }}
-                  onChange={({ detail }) => {
-                    const selectedOption = detail.selectedOption;
-                    if (selectedOption.value === "") {
-                      // Handle empty selection
-                      handleDropdownChange(key, null);
-                    } else if (selectedOption) {
-                      handleDropdownChange(key, { label: selectedOption.label, value: selectedOption.value });
-                    }
-                  }}
-                  options={options}
-                  placeholder={`Select ${key}`}
-                />
-              </FormField>
-            ))}
+            {Object.entries(dropdownOptions)
+              .filter(([key, _]) => ['Life Cycle', 'Size'].includes(key))
+              .map(([key, options]) => (
+                <FormField 
+                  key={key} 
+                  label={`Select ${key}`}
+                >
+                  <Select
+                    selectedOption={dropdowns[key] || { label: "No selection", value: "" }}
+                    onChange={({ detail }) => {
+                      const selectedOption = detail.selectedOption;
+                      if (selectedOption.value === "") {
+                        handleDropdownChange(key, null);
+                      } else if (selectedOption) {
+                        handleDropdownChange(key, {
+                          label: selectedOption.label || "",
+                          value: selectedOption.value
+                        });
+                      }
+                    }}
+                    options={options}
+                    placeholder={`Select ${key}`}
+                  />
+                </FormField>
+              ))}
           </ColumnLayout>
-        </Box>
 
-        {/* Checkbox Filters */}
-        <Box margin={{ bottom: 'l' }}>
-          {Object.entries(checkboxOptions).map(([group, options]) => (
-            <Box key={group} margin={{ bottom: 'm' }}>
-              <Header>{`Filter by ${group}`}</Header>
-              {options.length > 0 ? (
-                options.map((option) => (
+          {/* Category Checkboxes */}
+          <Box margin={{ top: "l" }}>
+            <Header variant="h3">
+              Select Business Category
+            </Header>
+            <Box
+              margin={{ top: "m" }}
+            >
+              {(checkboxOptions['Category'] || []).map((option) => (
+                <Box padding="xs">  {/* Added small padding around each checkbox */}
                   <Checkbox
-                    key={`${group}-${option}`}
-                    checked={checkboxSelections[group]?.has(option) || false}
+                    key={`Category-${option}`}
+                    checked={checkboxSelections['Category']?.has(option) || false}
                     onChange={({ detail }) => {
                       setCheckboxSelections((prev) => {
-                        const updated = new Set(prev[group]);
+                        const updated = new Set(prev['Category']);
                         if (detail.checked) {
                           updated.add(option);
                         } else {
                           updated.delete(option);
                         }
-                        return { ...prev, [group]: updated };
+                        return { ...prev, ['Category']: updated };
                       });
                     }}
                   >
                     {option}
                   </Checkbox>
-                ))
-              ) : (
-                <p>No options available for {group}</p>
-              )}
+                </Box>
+              ))}
             </Box>
-          ))}
-        </Box>
+          </Box>
+        </div>
+
+        {/* Secondary Filters Section */}
+        <div style={{
+          backgroundColor: '#f5f7fa',
+          padding: '30px',
+          borderRadius: '15px',
+          marginBottom: '40px'
+        }}>
+          <Header
+            variant="h1"
+            description="Select additional filters to refine your search"
+          >
+            Step 2: Additional Filters
+          </Header>
+
+          {/* Other Checkbox Groups */}
+          {Object.entries(checkboxOptions)
+            .filter(([group, _]) => group !== 'Category')
+            .map(([group, options]) => (
+              <Box key={group} margin={{ bottom: 'l' }}>
+                <Header variant="h3">{group}</Header>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                  gap: '15px',
+                  fontSize: '16px'  // Increased font size
+                }}>
+                  {options.map((option) => (
+                    <Checkbox
+                      key={`${group}-${option}`}
+                      checked={checkboxSelections[group]?.has(option) || false}
+                      onChange={({ detail }) => {
+                        setCheckboxSelections((prev) => {
+                          const updated = new Set(prev[group]);
+                          if (detail.checked) {
+                            updated.add(option);
+                          } else {
+                            updated.delete(option);
+                          }
+                          return { ...prev, [group]: updated };
+                        });
+                      }}
+                    >
+                      {option}
+                    </Checkbox>
+                  ))}
+                </div>
+              </Box>
+            ))}
+        </div>
 
         {/* Filter Results Button */}
-        <Box textAlign="center" margin={{ bottom: 'l' }}>
-          <Button variant="primary" onClick={filterData}>
+        <Box textAlign="center" margin={{ bottom: 'xl' }}>
+          <Button 
+            variant="primary" 
+            onClick={filterData}
+          >
             Filter Results
           </Button>
         </Box>
 
-        {/* Filtered Data Table */}
-        <Box margin={{ top: 'l' }}>
+        {/* Results Table */}
+        <Box margin={{ top: 'xl' }}>
           {filteredData.length > 0 ? (
             <Table
-              header={<Header>Filtered Results</Header>}
+              header={<Header variant="h2">Filtered Results</Header>}
               columnDefinitions={[
                 {
                   id: 'Agency',
@@ -253,9 +348,10 @@ const ResourcesPage: React.FC = () => {
               stripedRows
             />
           ) : (
-            <p>No matching records found.</p>
+            <p style={{ fontSize: '18px', textAlign: 'center' }}>No matching records found.</p>
           )}
         </Box>
+      </Box>
     </div>
   );
 };
