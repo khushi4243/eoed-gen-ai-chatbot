@@ -104,12 +104,9 @@ const ResourcesPage: React.FC = () => {
     const resourcesList = filteredData.map(item => 
       `${item['Resource Name']}`
     ).join(', ');
-    
+
     const prompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
-    Could you please:
-    1. Summarize these resources and their key benefits
-    2. Explain how these programs might work together
-    3. Highlight any important eligibility requirements or deadlines`;
+    Could you please summarize these resources and their key benefits?`;
 
     // Navigate to the chatbot page with the prompt
     navigate(`/chatbot/playground/${newSessionId}`, { state: { prompt } });
