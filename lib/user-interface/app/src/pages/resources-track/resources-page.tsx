@@ -45,10 +45,13 @@ const ResourcesPage: React.FC = () => {
 
         // Transform dropdown options for Cloudscape Select
         const transformedDropdowns = Object.keys(validDropdowns).reduce((acc, key) => {
-          acc[key] = validDropdowns[key].map((option: string) => ({
-            label: option.toString(),
-            value: option.toString(),
-          }));
+          acc[key] = [
+            { label: "No selection", value: "" },  // Add empty option
+            ...validDropdowns[key].map((option: string) => ({
+              label: option.toString(),
+              value: option.toString(),
+            }))
+          ];
           return acc;
         }, {});
         setDropdownOptions(transformedDropdowns);
@@ -159,10 +162,13 @@ const ResourcesPage: React.FC = () => {
             {Object.entries(dropdownOptions).map(([key, options]) => (
               <FormField key={key} label={`Filter by ${key}`}>
                 <Select
-                  selectedOption={dropdowns[key]}
+                  selectedOption={dropdowns[key] || { label: "No selection", value: "" }}
                   onChange={({ detail }) => {
                     const selectedOption = detail.selectedOption;
-                    if (selectedOption) {
+                    if (selectedOption.value === "") {
+                      // Handle empty selection
+                      handleDropdownChange(key, null);
+                    } else if (selectedOption) {
                       handleDropdownChange(key, { label: selectedOption.label, value: selectedOption.value });
                     }
                   }}
