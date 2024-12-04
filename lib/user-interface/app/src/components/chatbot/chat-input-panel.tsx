@@ -17,7 +17,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -75,6 +75,11 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
     selectedDataSource,
     setSelectedDataSource
   ] = useState({ label: "Bedrock Knowledge Base", value: "kb" } as SelectProps.ChangeDetail["selectedOption"]);
+
+  const location = useLocation();
+  const initialPrompt = location.state?.prompt || '';
+
+  const initialPromptHandled = useRef(false);
 
   useEffect(() => {
     messageHistoryRef.current = props.messageHistory;    
@@ -150,7 +155,7 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
       return;          
     }
     setState({ value: "" });    
-    
+
     try {
       props.setRunning(true);
       let receivedData = '';      
@@ -305,6 +310,19 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
     [ReadyState.CLOSED]: "Closed",
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
+
+  useEffect(() => {
+    if (initialPrompt && !initialPromptHandled.current) {
+      // Set the prompt as the current message
+      setState({ value: initialPrompt });
+      
+      // Automatically send the message after a short delay
+      setTimeout(() => {
+        handleSendMessage();
+        initialPromptHandled.current = true; // Mark the prompt as handled
+      }, 500);
+    }
+  }, [initialPrompt]); // Only depend on initialPrompt
 
   return (
     <SpaceBetween direction="vertical" size="l">

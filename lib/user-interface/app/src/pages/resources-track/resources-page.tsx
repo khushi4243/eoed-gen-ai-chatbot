@@ -14,10 +14,13 @@ import {
   Checkbox,
 } from '@cloudscape-design/components';
 import '../../styles/resources.css';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 const ResourcesPage: React.FC = () => {
   const appContext = useContext(AppContext);
   const loadExcelClient = useMemo(() => new LoadExcelClient(appContext), [appContext]);
+  const navigate = useNavigate();
 
   const [data, setData] = useState<any[]>([]);
   const [dropdownOptions, setDropdownOptions] = useState<{ [key: string]: { label: string; value: string }[] }>({});
@@ -96,8 +99,20 @@ const ResourcesPage: React.FC = () => {
   };
 
   const handleNavigateToAI = () => {
-    console.log('Navigating to AI');
-    alert('this will navigate to the ai chatbot');
+    // Create a list of resources
+    const newSessionId = uuidv4();
+    const resourcesList = filteredData.map(item => 
+      `${item['Resource Name']}`
+    ).join(', ');
+    
+    const prompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
+    Could you please:
+    1. Summarize these resources and their key benefits
+    2. Explain how these programs might work together
+    3. Highlight any important eligibility requirements or deadlines`;
+
+    // Navigate to the chatbot page with the prompt
+    navigate(`/chatbot/playground/${newSessionId}`, { state: { prompt } });
   };
 
   // Filter data based on dropdown and checkbox selections
