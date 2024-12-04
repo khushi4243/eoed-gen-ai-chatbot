@@ -233,22 +233,18 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
       });
       // Event listener for incoming messages
       ws.addEventListener('message', async function incoming(data) {
-        /**This is a custom tag from the API that denotes that an error occured
-         * and the next chunk will be an error message. */              
         if (data.data.includes("<!ERROR!>:")) {
           addNotification("error",data.data);          
           ws.close();
           return;
         }
-        /**This is a custom tag from the API that denotes when the model response
-         * ends and when the sources are coming in
-         */
         if (data.data == '!<|EOF_STREAM|>!') {          
           incomingMetadata = true;
           return;          
         }
         if (!incomingMetadata) {
-          receivedData += data.data;
+          const cleanedData = data.data.replace(/<[^>]*>/g, '');
+          receivedData += cleanedData;
         } else {
           let sourceData = JSON.parse(data.data);
           sourceData = sourceData.map((item) => {
@@ -262,16 +258,12 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           console.log(sources);
         }
 
-        // Update the chat history state with the new message        
         messageHistoryRef.current = [
           ...messageHistoryRef.current.slice(0, -2),
-
           {
             type: ChatBotMessageType.Human,
             content: messageToSend,
-            metadata: {
-              
-            },            
+            metadata: {},            
           },
           {
             type: ChatBotMessageType.AI,            
