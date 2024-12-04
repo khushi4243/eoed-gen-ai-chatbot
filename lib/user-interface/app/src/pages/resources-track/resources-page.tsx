@@ -27,6 +27,7 @@ const ResourcesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [checkboxSelections, setCheckboxSelections] = useState<{ [key: string]: Set<string> }>({});
   const [checkboxOptions, setCheckboxOptions] = useState<{ [key: string]: string[] }>({});
+  const [hasFilteredWithSelections, setHasFilteredWithSelections] = useState(false);
 
   // Fetch data from the backend
   useEffect(() => {
@@ -94,14 +95,33 @@ const ResourcesPage: React.FC = () => {
     }));
   };
 
+  const handleNavigateToAI = () => {
+    console.log('Navigating to AI');
+    alert('this will navigate to the ai chatbot');
+  };
+
   // Filter data based on dropdown and checkbox selections
   const filterData = () => {
+    // Safely check dropdowns with null checks
+    const hasDropdownSelections = dropdowns && Object.values(dropdowns).some(value => 
+      value !== null && value !== undefined
+    );
+    
+    // Safely check checkbox selections with null checks
+    const hasCheckboxSelections = checkboxSelections && Object.values(checkboxSelections).some(
+      selections => selections && selections.size > 0
+    );
+
+    // Update the state based on both conditions
+    setHasFilteredWithSelections(Boolean(hasDropdownSelections && hasCheckboxSelections));
+
+    // Your existing filter logic
     let filtered = [...data];
     console.log('Starting filter with records:', filtered.length);
 
     // 1. Apply AND logic for dropdowns and Category
     // First, handle dropdowns (Size and Life Cycle)
-    const activeDropdowns = Object.entries(dropdowns).filter(([_, value]) => value !== null);
+    const activeDropdowns = Object.entries(dropdowns || {}).filter(([_, value]) => value !== null);
     if (activeDropdowns.length > 0) {
       filtered = filtered.filter(item => {
         return activeDropdowns.every(([_, value]) => {
@@ -163,14 +183,18 @@ const ResourcesPage: React.FC = () => {
   }
 
   return (
-    <div>
-      {/* Main Header */}
+    <div style={{ margin: 0, padding: 0 }}>
+      {/* Main Header with zero top margin/padding */}
       <div style={{ 
         textAlign: 'center', 
         padding: '40px 0', 
-        backgroundColor: '#001f3f', 
-        color: 'white',
-        marginBottom: '40px'  // Increased margin
+        backgroundColor: '#001f3f',
+        margin: 0,
+        position: 'relative',
+        top: 0,
+        left: 0,
+        right: 0,
+        width: '100%'
       }}>
         <div style={{ 
           fontSize: '48px', 
@@ -317,13 +341,28 @@ const ResourcesPage: React.FC = () => {
         </div>
 
         {/* Filter Results Button */}
-        <Box textAlign="center" margin={{ bottom: 'xl' }}>
+        <Box 
+          textAlign="center" 
+          margin={{ bottom: 'xl' }}
+        >
           <Button 
             variant="primary" 
             onClick={filterData}
           >
             Filter Results
           </Button>
+
+          {hasFilteredWithSelections && (
+            <Box margin={{ top: 'm' }}> 
+              <Button
+                variant="normal"
+                onClick={handleNavigateToAI}
+                iconName="status-info"
+              >
+                Learn More with AI
+              </Button>
+            </Box>
+          )}
         </Box>
 
         {/* Results Table */}
