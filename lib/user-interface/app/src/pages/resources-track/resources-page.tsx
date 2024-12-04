@@ -99,8 +99,8 @@ const ResourcesPage: React.FC = () => {
     let filtered = [...data];
     console.log('Starting filter with records:', filtered.length);
 
-    // Apply dropdown filters (AND logic)
-    // Records must match ALL selected dropdown values
+    // 1. Apply AND logic for dropdowns and Category
+    // First, handle dropdowns (Size and Life Cycle)
     const activeDropdowns = Object.entries(dropdowns).filter(([_, value]) => value !== null);
     if (activeDropdowns.length > 0) {
       filtered = filtered.filter(item => {
@@ -111,18 +111,30 @@ const ResourcesPage: React.FC = () => {
       });
     }
 
-    // Apply checkbox filters (OR logic across all checkbox categories)
-    // Records are included if they match ANY selected checkbox
-    const activeCheckboxes = Object.entries(checkboxSelections)
-      .filter(([_, selections]) => selections.size > 0)
-      .map(([group, selections]) => Array.from(selections))
-      .flat();
-
-    if (activeCheckboxes.length > 0) {
+    // Then, handle Category checkboxes with AND logic
+    const categorySelections = checkboxSelections['Category'] || new Set();
+    if (categorySelections.size > 0) {
       filtered = filtered.filter(item => {
-        // Check if the item matches ANY of the selected checkboxes
-        return activeCheckboxes.some(selection => item[selection] === 1);
+        return Array.from(categorySelections).some(selection => item[selection] === 1);
       });
+    }
+
+    // 2. Apply OR logic for all other checkbox groups
+    const otherCheckboxGroups = Object.entries(checkboxSelections)
+      .filter(([group, _]) => group !== 'Category')
+      .filter(([_, selections]) => selections.size > 0);
+
+    if (otherCheckboxGroups.length > 0) {
+      const allOtherSelections = otherCheckboxGroups
+        .map(([_, selections]) => Array.from(selections))
+        .flat();
+
+      if (allOtherSelections.length > 0) {
+        filtered = filtered.filter(item => {
+          // Item matches if it has ANY of the selected checkboxes from any group
+          return allOtherSelections.some(selection => item[selection] === 1);
+        });
+      }
     }
 
     console.log('Final filtered count:', filtered.length);
