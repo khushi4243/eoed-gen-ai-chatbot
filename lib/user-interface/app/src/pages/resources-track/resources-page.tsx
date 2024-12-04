@@ -110,14 +110,16 @@ const ResourcesPage: React.FC = () => {
     Could you please summarize these resources and their key benefits,
     and highlight any important eligibility requirements or deadlines for each resource?`;
 
-    // Navigate with both prompts
-    navigate(`/chatbot/playground/${newSessionId}`, { 
-      state: { 
-        displayPrompt,
-        actualPrompt 
-      } 
-    });
+    navigate(`/chatbot/playground/${newSessionId}`, { state: { actualPrompt } });
   };
+    // Navigate with both prompts
+  //   navigate(`/chatbot/playground/${newSessionId}`, { 
+  //     state: { 
+  //       displayPrompt,
+  //       actualPrompt 
+  //     } 
+  //   });
+  // };
 
   // Filter data based on dropdown and checkbox selections
   const filterData = () => {
