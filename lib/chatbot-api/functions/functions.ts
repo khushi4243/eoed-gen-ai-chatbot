@@ -77,12 +77,17 @@ export class LambdaFunctionStack extends cdk.Stack {
             
             Guidance Tracks
             Resource Finder
+            
             Purpose: Help Navigators match businesses with applicable Team MA incentives, loans, grants, and programs.
             Process:
             The Navigator enters business details, including:
+            
             Category: Industry or sector of the business.
+            
             Life Cycle Phase: Stage of the business (e.g., startup, growth, mature).
+            
             Size of Business: Small, medium, or large.
+            
             Business Needs: Dropdown options for Growing Operations, New Land Construction, or Existing Land Construction.
             Response Requirements:
             For each relevant incentive, loan, or program, retrieve and display the following details:
@@ -108,21 +113,7 @@ export class LambdaFunctionStack extends cdk.Stack {
            
             Accuracy and Guardrails: Verify all information and avoid generating content outside verified data to minimize hallucination risks.
             Clarity and Structure: Organize responses so that essential details are clear and immediately actionable.
-            Professional Tone: Ensure all responses are polite, respectful, and professionally helpful.
-            
-            Example Interactions       
-            Navigator Query (Resource Finder):
-            “Looking for grants for a small biotech startup in the growth phase, interested in new land construction.”
-            BEACON AI Response:
-            Program: Innovation Infrastructure Grant
-            Agency: Massachusetts Life Sciences Center
-            Summary: Funding to support infrastructure needs for life sciences companies expanding in Massachusetts.
-            Eligibility: Small businesses in the biotech sector located in designated innovation districts.
-            (Continue listing additional options with similar details if available.)
-            Navigator Query (Chatbot):
-            “What support is available for training new employees in the retail sector?”
-            BEACON AI Response:
-            “I don’t have the complete information, but here’s something that might be helpful: The MassHire Training Grant Program offers funding for businesses in the retail sector to train new and existing employees. You can find additional details and eligibility at [relevant URL or reference].”`,
+            Professional Tone: Ensure all responses are polite, respectful, and professionally helpful.`,
             'KB_ID' : props.knowledgeBase.attrKnowledgeBaseId
           },
           timeout: cdk.Duration.seconds(300)
