@@ -31,6 +31,7 @@ const ResourcesPage: React.FC = () => {
   const [checkboxSelections, setCheckboxSelections] = useState<{ [key: string]: Set<string> }>({});
   const [checkboxOptions, setCheckboxOptions] = useState<{ [key: string]: string[] }>({});
   const [hasFilteredWithSelections, setHasFilteredWithSelections] = useState(false);
+  const [hasFiltered, setHasFiltered] = useState<boolean>(false);
 
   // Fetch data from the backend
   useEffect(() => {
@@ -108,7 +109,7 @@ const ResourcesPage: React.FC = () => {
     const displayPrompt = "Finding more information about the selected grants and programs...";
     const actualPrompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
     Could you please summarize these resources and their key benefits,
-    and highlight any important eligibility requirements or deadlines for each resource?`;
+    and highlight all important eligibility requirements or deadlines (if any) for each resource?`;
 
     navigate(`/chatbot/playground/${newSessionId}`, { 
       state: { 
@@ -184,6 +185,11 @@ const ResourcesPage: React.FC = () => {
 
     console.log('Final filtered count:', filtered.length);
     setFilteredData(filtered);
+    setHasFiltered(true);
+  };
+
+  const handleDeleteRecord = (resourceName: string) => {
+    setFilteredData((prevData) => prevData.filter(item => item['Resource Name'] !== resourceName));
   };
 
   if (isLoading) {
@@ -406,6 +412,18 @@ const ResourcesPage: React.FC = () => {
                   header: 'Resource Name',
                   cell: (item) => item['Resource Name'] || '-',
                 },
+                ...(hasFiltered ? [{
+                  id: 'Actions',
+                  header: 'Actions',
+                  cell: (item) => (
+                    <Button
+                      variant="link"
+                      onClick={() => handleDeleteRecord(item['Resource Name'])}
+                    >
+                      Remove
+                    </Button>
+                  ),
+                }] : []),
               ]}
               items={filteredData}
               wrapLines
