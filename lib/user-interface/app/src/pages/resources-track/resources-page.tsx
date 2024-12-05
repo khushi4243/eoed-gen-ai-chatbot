@@ -383,7 +383,7 @@ const ResourcesPage: React.FC = () => {
             Filter Results
           </Button>
 
-          {hasFilteredWithSelections && (
+          {hasFiltered && (
             <Box margin={{ top: 'm' }}> 
               <Button
                 variant="normal"
