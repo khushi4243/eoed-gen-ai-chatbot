@@ -1,11 +1,25 @@
 import BaseAppLayout from "../../../components/base-app-layout";
 import Chat from "../../../components/chatbot/chat";
+import EmailPanel from "../../../components/chatbot/email-panel";
 
 import { Link, useParams } from "react-router-dom";
 import { Header, HelpPanel } from "@cloudscape-design/components";
+import { useState, useEffect, useRef } from "react";
+import { ChatBotHistoryItem } from "../../../components/chatbot/types";
 
 export default function Playground() {
   const { sessionId } = useParams();
+  const [messageHistoryForEmail, setMessageHistoryForEmail] = useState<ChatBotHistoryItem[]>([]);
+  const [splitPanelOpen, setSplitPanelOpen] = useState<boolean>(false);
+  const firstRender = useRef(true);
+
+  useEffect(() => {
+    if (!firstRender.current && messageHistoryForEmail.length > 0) {
+      setSplitPanelOpen(true);
+    } else {
+      firstRender.current = false;
+    }    
+  }, [messageHistoryForEmail]);
 
   return (    
     <BaseAppLayout
@@ -35,13 +49,20 @@ export default function Playground() {
         </HelpPanel>
       }
       toolsWidth={300}       
+      splitPanelOpen={splitPanelOpen}
+      onSplitPanelToggle={({ detail }) => setSplitPanelOpen(detail.open)}
+      splitPanel={
+        <EmailPanel 
+          isHidden={!splitPanelOpen} 
+          messageHistory={messageHistoryForEmail}
+        />
+      }
       content={
-       <div>
-      {/* <Chat sessionId={sessionId} /> */}
-      
-      <Chat sessionId={sessionId} />
-      </div>
-     }
+        <Chat 
+          sessionId={sessionId} 
+          updateEmailFunction={setMessageHistoryForEmail} 
+        />
+      }
     />    
   );
 }
