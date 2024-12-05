@@ -110,7 +110,11 @@ const ResourcesPage: React.FC = () => {
     Could you please summarize these resources and their key benefits,
     and highlight any important eligibility requirements or deadlines for each resource?`;
 
-    navigate(`/chatbot/playground/${newSessionId}`, { state: { actualPrompt } });
+    navigate(`/chatbot/playground/${newSessionId}`, { 
+      state: { 
+        prompt: actualPrompt 
+      } 
+    });
   };
     // Navigate with both prompts
   //   navigate(`/chatbot/playground/${newSessionId}`, { 
