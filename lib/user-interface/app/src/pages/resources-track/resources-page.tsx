@@ -412,6 +412,11 @@ const ResourcesPage: React.FC = () => {
                   header: 'Resource Name',
                   cell: (item) => item['Resource Name'] || '-',
                 },
+                {
+                  id: 'Task Type',
+                  header: 'Task Type',
+                  cell: (item) => item['Task Type'] || '-',
+                },
                 ...(hasFiltered ? [{
                   id: 'Actions',
                   header: 'Actions',

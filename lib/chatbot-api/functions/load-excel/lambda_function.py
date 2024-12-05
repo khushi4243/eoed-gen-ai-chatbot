@@ -145,7 +145,8 @@ def process_excel_data(df, headings):
             
         record = {
             'Agency': row['Agency'],
-            'Resource Name': row['Resource Name']
+            'Resource Name': row['Resource Name'],
+            'Task Type': row['Task Type']
         }
         
         # Add values for each dropdown/checkbox field
