@@ -104,16 +104,19 @@ export default function ChatMessage(props: ChatMessageProps) {
         selectedOption = {selectedTopic}
         onChange = {({detail}) => setSelectedTopic({label: detail.selectedOption.label,value: detail.selectedOption.value})}
         options ={feedbackCategories}
+        aria-label="Feedback Topic"
         />
         <Select
         selectedOption = {selectedFeedbackType}
         onChange = {({detail}) => setSelectedFeedbackType({label: detail.selectedOption.label,value: detail.selectedOption.value})}
         options ={feedbackTypes}
+        aria-label="Feedback Type"
         />
         <FormField label="Please enter feedback here">
           <Input
           onChange={({detail}) => setValue(detail.value)}
           value={value}
+          aria-label="Feedback Message"
           />
         </FormField>
         </SpaceBetween>
