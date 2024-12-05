@@ -117,10 +117,10 @@ export default function Chat(props: { sessionId?: string, updateEmailFunction: R
   }
 
   const handleUpdateMessageHistory = async () => {
-    console.log("updating history for email")
+    console.log("updating history for email");
     props.updateEmailFunction(messageHistory);
     setIsEmailPanelHidden(false);
-  }
+  };
 
   return (
     <div className={styles.chat_container}> 
@@ -131,7 +131,7 @@ export default function Chat(props: { sessionId?: string, updateEmailFunction: R
           statusIconAriaLabel="Info"
           header=""
        >
-        AI Models can make mistakes. Be mindful in validating important information.
+        AI can make mistakes. Please verify any important information. This tool is for internal use only.
       </Alert> )}
 
       
@@ -140,8 +140,7 @@ export default function Chat(props: { sessionId?: string, updateEmailFunction: R
             key={idx}
             message={message}            
             onThumbsUp={() => handleFeedback(1,idx, message)}
-            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => 
-              handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}
+            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}
             onSendEmail={() => handleUpdateMessageHistory()}
             isLastMessage={idx == messageHistory.length - 1}
           />
