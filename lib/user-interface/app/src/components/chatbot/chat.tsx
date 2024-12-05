@@ -140,7 +140,10 @@ export default function Chat(props: { sessionId?: string, updateEmailFunction: R
             key={idx}
             message={message}            
             onThumbsUp={() => handleFeedback(1,idx, message)}
-            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}                        
+            onThumbsDown={(feedbackTopic : string, feedbackType : string, feedbackMessage: string) => 
+              handleFeedback(0,idx, message,feedbackTopic, feedbackType, feedbackMessage)}
+            onSendEmail={() => handleUpdateMessageHistory()}
+            isLastMessage={idx == messageHistory.length - 1}
           />
         ))}
       </SpaceBetween>

@@ -35,6 +35,8 @@ export interface ChatMessageProps {
   message: ChatBotHistoryItem;  
   onThumbsUp: () => void;
   onThumbsDown: (feedbackTopic : string, feedbackType : string, feedbackMessage: string) => void;  
+  onSendEmail: () => void;
+  isLastMessage: boolean;
 }
 
 
@@ -222,6 +224,13 @@ export default function ChatMessage(props: ChatMessageProps) {
               />
             )}
           </div>
+          {props.isLastMessage ? (
+            <Button onClick={() => {
+              props.onSendEmail();
+            }}>
+              Generate Email
+            </Button>
+          ) : <></>}
         </Container>
       )}
       {loading && (
