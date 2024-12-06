@@ -244,8 +244,8 @@ const ResourcesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Main Content */}
-      <Box padding={{ horizontal: 'xxxl' }}>
+      {/* Main Content - Added margin-top here */}
+      <Box padding={{ horizontal: 'xxxl', top: 'xxl' }}>
         {/* Primary Filters Section */}
         <div style={{
           backgroundColor: '#e8f0fa',
