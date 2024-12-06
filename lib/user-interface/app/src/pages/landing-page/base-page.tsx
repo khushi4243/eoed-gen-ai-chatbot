@@ -40,8 +40,7 @@ export default function LandingPage() {
           Welcome to BEACON AI
         </div>
         <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
-          An powered AI knowledge base able to answer any questions regarding resources in the
-          Executive Office of Economic Development.
+          Business Enhanced Assistance Center for Optimized Navigation
         </p>
       </div>
 
