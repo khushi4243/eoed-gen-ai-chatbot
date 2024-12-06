@@ -23,7 +23,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f5f7fa' }}>
+    <div style={{ minHeight: '125vh', backgroundColor: '#f5f7fa' }}>
       {/* Main Header */}
       <div style={{ 
         textAlign: 'center', 
