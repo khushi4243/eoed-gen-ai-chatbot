@@ -85,7 +85,6 @@ export class LambdaFunctionStack extends cdk.Stack {
             
             Chatbot
             Purpose: Address open-ended inquiries directly from Navigators by providing suggestions or information available through EOED and Team MA resources.
-            Process:
             Retrieve relevant information using a web-crawled database of over 250 trusted websites.
             If the system lacks full details, provide the most helpful information available, beginning with a statement like:
             “I don’t have the complete information, but here’s something that might be helpful...”
@@ -104,6 +103,7 @@ export class LambdaFunctionStack extends cdk.Stack {
             Key Benefits: A bulleted summary of advantages or features.
             Eligibility Requirements: Clear bullet points listing criteria.
             Deadlines: Specific dates or general timelines under a separate heading.
+            Links: Relevant sources included parenthetically (e.g., (source.com)).
             Formatting Priorities: Focus on clarity and simplicity using bullets and uniform structure for easy scanning.
 
 
