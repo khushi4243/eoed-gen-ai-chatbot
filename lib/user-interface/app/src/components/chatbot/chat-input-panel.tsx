@@ -243,7 +243,11 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           return;          
         }
         if (!incomingMetadata) {
-          const cleanedData = data.data.replace(/<[^>]*>/g, '');
+          const cleanedData = data.data
+            .replace(/<[^>]*>/g, '') // Remove HTML tags
+            .replace(/&lt;[^&]*&gt;/g, '') // Remove encoded HTML tags
+            .replace(/\[result\]|\[\/result\]/g, '') // Remove [result] tags
+            .replace(/\[\/?div\]/g, ''); // Remove [div] tags
           receivedData += cleanedData;
         } else {
           let sourceData = JSON.parse(data.data);

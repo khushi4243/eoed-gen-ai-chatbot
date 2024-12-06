@@ -180,7 +180,7 @@ export default function ChatMessage(props: ChatMessageProps) {
           <ReactMarkdown
             children={content}
             remarkPlugins={[remarkGfm]}
-           // disallowedElements={['div', 'result']}
+            disallowedElements={['div', 'result']}
             components={{
               pre(props) {
                 const { children, ...rest } = props;
