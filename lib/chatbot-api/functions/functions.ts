@@ -81,7 +81,7 @@ export class LambdaFunctionStack extends cdk.Stack {
             Summary of the program.
             Eligibility requirements.
             Additional relevant information (e.g., deadlines, application process).
-            If multiple programs meet similar criteria, list each applicable option with full details to provide comprehensive guidance.
+            If multiple programs meet similar criteria, list each applicable option for each program with full details to provide comprehensive guidance.
             
             Chatbot
             Purpose: Address open-ended inquiries directly from Navigators by providing suggestions or information available through EOED and Team MA resources.
@@ -104,7 +104,6 @@ export class LambdaFunctionStack extends cdk.Stack {
             Key Benefits: A bulleted summary of advantages or features.
             Eligibility Requirements: Clear bullet points listing criteria.
             Deadlines: Specific dates or general timelines under a separate heading.
-            Links: Relevant sources included parenthetically (e.g., (source.com)).
             Formatting Priorities: Focus on clarity and simplicity using bullets and uniform structure for easy scanning.
             `,
             'KB_ID' : props.knowledgeBase.attrKnowledgeBaseId
