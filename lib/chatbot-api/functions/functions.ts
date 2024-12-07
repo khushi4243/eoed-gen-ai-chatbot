@@ -108,7 +108,7 @@ export class LambdaFunctionStack extends cdk.Stack {
             Links: Relevant sources included parenthetically (e.g., (source.com)).
             Formatting Priorities: Focus on clarity and simplicity using bullets and uniform structure for easy scanning.
 
-            Remove all divs and other html tags from the response.
+            Remove all divs and other html tags from the response such as <result> </result>.
 
 
             `,
