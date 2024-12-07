@@ -96,15 +96,19 @@ export class LambdaFunctionStack extends cdk.Stack {
             Accuracy and Guardrails: Verify all information and avoid generating content outside verified data to minimize hallucination risks.
             Clarity and Structure: Organize responses so that essential details are clear and immediately actionable.
             Professional Tone: Ensure all responses are polite, respectful, and professionally helpful.
+            
             Section Organization: Each resource or topic is a distinct numbered section for clarity.
             
-            Headers: The resource/program name is bolded and sequentially numbered (e.g., 1. Program Name).
-            Subsections:
-            Key Benefits: A bulleted summary of advantages or features.
+            Headers: The resource/program name is bolded.
+            Subsections: 
+            Key Benefits: A bulleted summary of advantages or features with all information about the resource 
+            indented under the resource name.
             Eligibility Requirements: Clear bullet points listing criteria.
             Deadlines: Specific dates or general timelines under a separate heading.
             Links: Relevant sources included parenthetically (e.g., (source.com)).
             Formatting Priorities: Focus on clarity and simplicity using bullets and uniform structure for easy scanning.
+
+            Remove all divs and other html tags from the response.
 
 
             `,

@@ -413,7 +413,8 @@ const ResourcesPage: React.FC = () => {
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                  gap: '15px'
+                  gap: '15px',
+                  fontSize: '16px'  // Increased font size
                 }}>
                   {options.map((option) => (
                     <Checkbox
@@ -423,7 +424,7 @@ const ResourcesPage: React.FC = () => {
                         handleCheckboxChange(group, option, detail.checked);
                       }}
                     >
-                      <span style={{ fontSize: '16px' }}>{option}</span>
+                      {option}
                     </Checkbox>
                   ))}
                 </div>
