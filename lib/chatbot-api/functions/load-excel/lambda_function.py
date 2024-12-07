@@ -57,43 +57,74 @@ def retrieve_kb_docs(file_name, knowledge_base_id, bedrock_client, s3_client):
     try:
         key, _ = os.path.splitext(file_name)
         print(f"Search query KB: {key}")
+        
         response = bedrock_client.retrieve(
             knowledgeBaseId=knowledge_base_id,
             retrievalQuery={'text': key},
             retrievalConfiguration={
                 'vectorSearchConfiguration': {
-                    'numberOfResults': 5  # We only want the most relevant document
+                    'numberOfResults': 5
                 }
             }
         )
         
-        print(f"Retrieve API Response: {response}")
+        print(f"Full Bedrock Response: {json.dumps(response, default=str)}")
 
         file_uri = None
         if response.get('retrievalResults'):
             for result in response['retrievalResults']:
-                uri = result['location']['s3Location']['uri']
-                if file_name in uri:
-                    file_uri = uri
-                    break
+                # Add defensive checks for the location structure
+                if ('location' in result and 
+                    's3Location' in result['location'] and 
+                    'uri' in result['location']['s3Location']):
+                    uri = result['location']['s3Location']['uri']
+                    if file_name in uri:
+                        file_uri = uri
+                        break
+                else:
+                    print(f"Unexpected result structure: {json.dumps(result, default=str)}")
+
+        # If no file found through Bedrock, try direct S3 access
+        if not file_uri:
+            try:
+                bucket_name = os.getenv('BUCKET')
+                if not bucket_name:
+                    raise ValueError("BUCKET environment variable not set")
+                    
+                print(f"Attempting direct S3 access in bucket: {bucket_name}")
+                s3_response = s3_client.list_objects_v2(
+                    Bucket=bucket_name,
+                    Prefix=file_name
+                )
+                
+                if 'Contents' in s3_response and s3_response['Contents']:
+                    object_key = s3_response['Contents'][0]['Key']
+                    file_uri = f"s3://{bucket_name}/{object_key}"
+                    print(f"Found file directly in S3: {file_uri}")
+                else:
+                    raise FileNotFoundError(f"File {file_name} not found in S3 bucket")
+            except Exception as e:
+                print(f"S3 fallback search failed: {str(e)}")
+                raise
 
         if not file_uri:
-            raise FileNotFoundError(f"File {file_name} not found in knowledge base")
+            raise FileNotFoundError(f"File {file_name} not found in knowledge base or S3")
 
         # Parse the S3 URI
         s3_parts = file_uri.replace("s3://", "").split("/", 1)
         bucket_name = s3_parts[0]
         object_key = s3_parts[1]
 
-        # Download the file from S3 to Lambda's /tmp directory
+        # Download the file
         local_file_path = f"/tmp/{file_name}"
+        print(f"Downloading from bucket: {bucket_name}, key: {object_key}")
         s3_client.download_file(bucket_name, object_key, local_file_path)
         print(f"File downloaded to {local_file_path}")
 
         return local_file_path
 
     except Exception as e:
-        print(f"Error retrieving document: {e}")
+        print(f"Error retrieving document: {str(e)}")
         raise
 
 def process_excel_data(df, headings):
