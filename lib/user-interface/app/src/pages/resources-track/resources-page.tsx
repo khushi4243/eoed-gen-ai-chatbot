@@ -33,7 +33,9 @@ const ResourcesPage: React.FC = () => {
   const [checkboxOptions, setCheckboxOptions] = useState<{ [key: string]: string[] }>({});
   const [hasFilteredWithSelections, setHasFilteredWithSelections] = useState(false);
   const [hasFiltered, setHasFiltered] = useState<boolean>(false);
-  const [warningVisible, setWarningVisible] = useState(false);
+  const [warningVisible, setWarningVisible] = useState<boolean>(false);
+  const [hasSelections, setHasSelections] = useState(false);
+  const [scrollBannerVisible, setScrollBannerVisible] = useState<boolean>(true);
 
   // Fetch data from the backend
   useEffect(() => {
@@ -99,6 +101,35 @@ const ResourcesPage: React.FC = () => {
       ...prev,
       [key]: selectedOption,
     }));
+    checkForSelections();
+  };
+
+  // Add selection check for checkboxes
+  const handleCheckboxChange = (group: string, option: string, checked: boolean) => {
+    setCheckboxSelections((prev) => {
+      const updated = new Set(prev[group]);
+      if (checked) {
+        updated.add(option);
+      } else {
+        updated.delete(option);
+      }
+      return { ...prev, [group]: updated };
+    });
+    checkForSelections();
+  };
+
+  // Function to check if any selections have been made
+  const checkForSelections = () => {
+    const hasDropdownSelections = Object.values(dropdowns).some(value => 
+      value !== null && value !== undefined && value.value !== ""
+    );
+    
+    const hasCheckboxSelections = Object.values(checkboxSelections).some(
+      selections => selections && selections.size > 0
+    );
+
+    setHasSelections(hasDropdownSelections || hasCheckboxSelections);
+    setScrollBannerVisible(true);
   };
 
   const handleNavigateToAI = () => {
@@ -222,30 +253,13 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div style={{ margin: 0, padding: 0 }}>
-      {warningVisible && (
-        <Flashbar
-          items={[
-            {
-              type: "warning",
-              content: "Please make at least one selection before filtering.",
-              dismissible: true,
-              onDismiss: () => setWarningVisible(false),
-              id: "filter-warning"
-            }
-          ]}
-        />
-      )}
-      
-      {/* Main Header with zero top margin/padding */}
+      {/* Main Header */}
       <div style={{ 
         textAlign: 'center', 
         padding: '40px 0', 
         backgroundColor: '#001f3f',
         margin: 0,
         position: 'relative',
-        top: 0,
-        left: 0,
-        right: 0,
         width: '100%'
       }}>
         <div style={{ 
@@ -265,7 +279,32 @@ const ResourcesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Main Content - Added margin-top here */}
+      {/* Scroll Banner after header */}
+      {hasSelections && !hasFiltered && scrollBannerVisible && (
+        <div style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2000,
+          width: '100%'
+        }}>
+          <Flashbar
+            items={[
+              {
+                type: "info",
+                content: "Scroll down to filter results once all selections are made",
+                dismissible: true,
+                dismissLabel: "Dismiss message",
+                onDismiss: () => setScrollBannerVisible(false),
+                id: "scroll-banner"
+              }
+            ]}
+          />
+        </div>
+      )}
+
+      {/* Main Content */}
       <Box padding={{ horizontal: 'xxxl', top: 'xxl' }}>
         {/* Primary Filters Section */}
         <div style={{
@@ -334,15 +373,7 @@ const ResourcesPage: React.FC = () => {
                     key={`Category-${option}`}
                     checked={checkboxSelections['Category']?.has(option) || false}
                     onChange={({ detail }) => {
-                      setCheckboxSelections((prev) => {
-                        const updated = new Set(prev['Category']);
-                        if (detail.checked) {
-                          updated.add(option);
-                        } else {
-                          updated.delete(option);
-                        }
-                        return { ...prev, ['Category']: updated };
-                      });
+                      handleCheckboxChange('Category', option, detail.checked);
                     }}
                   >
                     {option}
@@ -384,15 +415,7 @@ const ResourcesPage: React.FC = () => {
                       key={`${group}-${option}`}
                       checked={checkboxSelections[group]?.has(option) || false}
                       onChange={({ detail }) => {
-                        setCheckboxSelections((prev) => {
-                          const updated = new Set(prev[group]);
-                          if (detail.checked) {
-                            updated.add(option);
-                          } else {
-                            updated.delete(option);
-                          }
-                          return { ...prev, [group]: updated };
-                        });
+                        handleCheckboxChange(group, option, detail.checked);
                       }}
                     >
                       {option}
@@ -413,6 +436,7 @@ const ResourcesPage: React.FC = () => {
                     type: "warning",
                     content: "Please make at least one selection before filtering.",
                     dismissible: true,
+                    dismissLabel: "Dismiss warning message",
                     onDismiss: () => setWarningVisible(false),
                     id: "filter-warning"
                   }
@@ -437,7 +461,7 @@ const ResourcesPage: React.FC = () => {
                 iconName="contact"
                 className="ai_button"
               >
-                Learn More About Resources
+                Summarize Resources
               </Button>
             )}
           </div>
