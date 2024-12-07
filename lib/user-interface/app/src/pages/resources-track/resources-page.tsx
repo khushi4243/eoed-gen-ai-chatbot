@@ -142,7 +142,8 @@ const ResourcesPage: React.FC = () => {
     const displayPrompt = "Finding more information about the selected grants and programs...";
     const actualPrompt = `Based on the filters selected, I found these resources: ${resourcesList}. 
     Could you please summarize these resources and their key benefits,
-    and highlight all eligibility requirements or deadlines (if any) for each resource?`;
+    and highlight all eligibility requirements or deadlines (if any) for each resource? Maintain all of 
+    the formatting requirements of the original system prompt.`;
 
     navigate(`/chatbot/playground/${newSessionId}`, { 
       state: { 
