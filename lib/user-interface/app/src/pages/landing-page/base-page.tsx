@@ -83,7 +83,7 @@ export default function LandingPage() {
         >
           <Icon name="status-positive" size="large" />
           <h2 style={{ margin: '20px 0', color: '#001f3f', fontWeight: 'bold', fontSize: '28px' }}>
-            Resources Filter
+            Resources Finder
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
             Input information regarding businesses to receive grants, programs, and other incentives

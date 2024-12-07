@@ -12,6 +12,7 @@ import {
   Spinner,
   Alert,
   Checkbox,
+  Flashbar,
 } from '@cloudscape-design/components';
 import '../../styles/resources.css';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +33,7 @@ const ResourcesPage: React.FC = () => {
   const [checkboxOptions, setCheckboxOptions] = useState<{ [key: string]: string[] }>({});
   const [hasFilteredWithSelections, setHasFilteredWithSelections] = useState(false);
   const [hasFiltered, setHasFiltered] = useState<boolean>(false);
+  const [warningVisible, setWarningVisible] = useState(false);
 
   // Fetch data from the backend
   useEffect(() => {
@@ -130,7 +132,7 @@ const ResourcesPage: React.FC = () => {
   const filterData = () => {
     // Safely check dropdowns with null checks
     const hasDropdownSelections = dropdowns && Object.values(dropdowns).some(value => 
-      value !== null && value !== undefined
+      value !== null && value !== undefined && value.value !== ""
     );
     
     // Safely check checkbox selections with null checks
@@ -138,9 +140,14 @@ const ResourcesPage: React.FC = () => {
       selections => selections && selections.size > 0
     );
 
-    // Update the state based on both conditions
-    setHasFilteredWithSelections(Boolean(hasDropdownSelections && hasCheckboxSelections));
+    // Check if any selections were made
+    if (!hasDropdownSelections && !hasCheckboxSelections) {
+      setWarningVisible(true);
+      setHasFiltered(false); // Ensure we stay in unfiltered state
+      return;
+    }
 
+    setWarningVisible(false);
     // Your existing filter logic
     let filtered = [...data];
     console.log('Starting filter with records:', filtered.length);
@@ -215,6 +222,20 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div style={{ margin: 0, padding: 0 }}>
+      {warningVisible && (
+        <Flashbar
+          items={[
+            {
+              type: "warning",
+              content: "Please make at least one selection before filtering.",
+              dismissible: true,
+              onDismiss: () => setWarningVisible(false),
+              id: "filter-warning"
+            }
+          ]}
+        />
+      )}
+      
       {/* Main Header with zero top margin/padding */}
       <div style={{ 
         textAlign: 'center', 
@@ -259,6 +280,17 @@ const ResourcesPage: React.FC = () => {
           >
             Step 1: Primary Filters
           </Header>
+          {error && (
+            <Alert
+              type="warning"
+              statusIconAriaLabel="Warning"
+              header="No filters selected"
+              dismissible
+              onDismiss={() => setError(null)}
+            >
+              {error}
+            </Alert>
+          )}
           {/* Primary Dropdowns (Life Cycle and Size) */}
           <ColumnLayout columns={2} borders="vertical">
             {Object.entries(dropdownOptions)
@@ -371,72 +403,89 @@ const ResourcesPage: React.FC = () => {
             ))}
         </div>
 
-        {/* Filter Results Button */}
-        <Box 
-          textAlign="center" 
-          margin={{ bottom: 'xl' }}
-        >
-          <Button 
-            variant="primary" 
-            onClick={filterData}
-          >
-            Filter Results
-          </Button>
+        {/* Warning Banner and Filter Results Button */}
+        <Box textAlign="center" margin={{ bottom: 'xl' }}>
+          {warningVisible && (
+            <Box margin={{ bottom: 'm' }}>
+              <Flashbar
+                items={[
+                  {
+                    type: "warning",
+                    content: "Please make at least one selection before filtering.",
+                    dismissible: true,
+                    onDismiss: () => setWarningVisible(false),
+                    id: "filter-warning"
+                  }
+                ]}
+              />
+            </Box>
+          )}
+          
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '40px'}}>
+            <Button 
+              variant="primary" 
+              onClick={filterData}
+              className="filter_button"
+            >
+              Filter Results
+            </Button>
 
-          {hasFiltered && (
-            <Box margin={{ top: 'm' }}> 
+            {hasFiltered && (
               <Button
                 variant="normal"
                 onClick={handleNavigateToAI}
-                iconName="status-info"
+                iconName="contact"
+                className="ai_button"
               >
-                Learn More with AI
+                Learn More About Resources
               </Button>
-            </Box>
-          )}
+            )}
+          </div>
         </Box>
 
-        {/* Results Table */}
+        {/* Results Section */}
         <Box margin={{ top: 'xl' }}>
-          {filteredData.length > 0 ? (
-            <Table
-              header={<Header variant="h2">Filtered Results</Header>}
-              columnDefinitions={[
-                {
-                  id: 'Agency',
-                  header: 'Agency',
-                  cell: (item) => item['Agency'] || '-',
-                },
-                {
-                  id: 'Resource Name',
-                  header: 'Resource Name',
-                  cell: (item) => item['Resource Name'] || '-',
-                },
-                {
-                  id: 'Task Type',
-                  header: 'Task Type',
-                  cell: (item) => item['Task Type'] || '-',
-                },
-                ...(hasFiltered ? [{
-                  id: 'Actions',
-                  header: 'Actions',
-                  cell: (item) => (
-                    <Button
-                      variant="link"
-                      onClick={() => handleDeleteRecord(item['Resource Name'])}
-                    >
-                      Remove
-                    </Button>
-                  ),
-                }] : []),
-              ]}
-              items={filteredData}
-              wrapLines
-              stripedRows
-            />
-          ) : (
-            <p style={{ fontSize: '18px', textAlign: 'center' }}>No matching records found.</p>
+          {error && (
+            <Alert type="error" dismissible onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
           )}
+          
+          <Table
+            header={<Header variant="h2">{hasFiltered ? "Filtered Results" : "Unfiltered Results"}</Header>}
+            columnDefinitions={[
+              {
+                id: 'Agency',
+                header: 'Agency',
+                cell: (item) => item['Agency'] || '-',
+              },
+              {
+                id: 'Resource Name',
+                header: 'Resource Name',
+                cell: (item) => item['Resource Name'] || '-',
+              },
+              {
+                id: 'Task Type',
+                header: 'Task Type',
+                cell: (item) => item['Task Type'] || '-',
+              },
+              ...(hasFiltered ? [{
+                id: 'Actions',
+                header: 'Actions',
+                cell: (item) => (
+                  <Button
+                    variant="link"
+                    onClick={() => handleDeleteRecord(item['Resource Name'])}
+                  >
+                    Remove
+                  </Button>
+                ),
+              }] : []),
+            ]}
+            items={hasFiltered ? filteredData : data}
+            wrapLines
+            stripedRows
+          />
         </Box>
       </Box>
     </div>
