@@ -75,6 +75,10 @@ export class ChatBotApi extends Construct {
     websocketBackend.wsAPI.addRoute('$disconnect', {
       integration: new WebSocketLambdaIntegration('chatbotDisconnectionIntegration', lambdaFunctions.chatFunction),
       // authorizer: wsAuthorizer
+    });
+    websocketBackend.wsAPI.addRoute('generateEmail', {
+      integration: new WebSocketLambdaIntegration('emailIntegration', lambdaFunctions.chatFunction),
+      // authorizer: wsAuthorizer
     });    
 
     websocketBackend.wsAPI.grantManageConnections(lambdaFunctions.chatFunction);
