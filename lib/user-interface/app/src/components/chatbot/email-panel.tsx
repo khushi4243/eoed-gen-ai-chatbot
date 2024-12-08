@@ -49,30 +49,24 @@ export default function EmailPanel(props: EmailPanelProps) {
       let recieved = '';
       ws.addEventListener('open', function open() {
         console.log('Connected to the WebSocket server');
-        // readline.question('What is your question? ', question => {
         const message = JSON.stringify({
           "action": "generateEmail",
           "data": {
             chatHistory: assembleHistory(props.messageHistory),
-            systemPrompt: `Given this chat history, please draft an email that summarizes the 
-            policies that were discussed. Use the following format:
+            systemPrompt: `Given this chat history, please draft an email that summarizes the resources that were discussed. Use the following format:
             Dear [Customer Name],
-            
-            I received your inquiry on <<TOPIC SUMMARY>>.
-            
-            <<Fill in the email with a policy quote if possible and answer the question briefly. Reference FTA
-            guidelines where possible>>
+
+            I received your inquiry on "<<TOPIC SUMMARY>>"}.
+
+            "<<Fill in the email with specific resource (grants, programs, etc.) if possible and answer the question briefly.>>"
             <<Make sure to close out the letter in a polite way>>
-        
+
             Best,
-            [NAME]`,
+            [Your Name Here]`,
           }
         });
-        // readline.close();
-        // Replace 'Hello, world!' with your message
+        console.log('Sending message:', message);
         ws.send(message);
-        // console.log('Message sent:', message);
-        // });
       });
       // Event listener for incoming messages
       ws.addEventListener('message', async function incoming(data) {
