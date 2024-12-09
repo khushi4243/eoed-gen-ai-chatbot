@@ -86,8 +86,7 @@ export default function LandingPage() {
             Resources Finder
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            Input information regarding businesses to receive grants, programs, and other incentives
-            the business might be eligible for.
+            Enter business details to receive a list of Team MA incentives, loans, and other programs the business may qualify for.
           </p>
         </div>
 
@@ -115,8 +114,7 @@ export default function LandingPage() {
             Chatbot
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-            An open ended chatbot to answer any inquiries regarding informational resources 
-            and helpful contacts within the Executive Office of Economic Development.
+          Ask the chatbot for suggestions on business resources or information available within the Executive Office of Economic Development, Team MA, and the Commonwealth of Massachusetts.
           </p>
         </div>
       </div>
