@@ -24,7 +24,7 @@ export default function LandingPage() {
 
   return (
     <div style={{ minHeight: '125vh', backgroundColor: '#f5f7fa' }}>
-      {/* Main Header */}
+      {/* Main Header */} 
       <div style={{ 
         textAlign: 'center', 
         padding: '80px 0', 
@@ -40,7 +40,7 @@ export default function LandingPage() {
           Welcome to BEACON AI
         </div>
         <p style={{ fontSize: '20px', color: '#d1e3f0', margin: '10px 0' }}>
-          Business Enhanced Assistance Center for Optimized Navigation
+          Business Enhancement and Assistance Center for Optimized Navigation
         </p>
       </div>
 
@@ -114,7 +114,7 @@ export default function LandingPage() {
             Chatbot
           </h2>
           <p style={{ color: '#333', textAlign: 'center', fontSize: '18px', maxWidth: '300px' }}>
-          Ask the chatbot for suggestions on business resources or information available within the Executive Office of Economic Development, Team MA, and the Commonwealth of Massachusetts.
+            Ask the chatbot for suggestions on business resources or information available within the Executive Office of Economic Development, Team MA, and the Commonwealth of Massachusetts.
           </p>
         </div>
       </div>
